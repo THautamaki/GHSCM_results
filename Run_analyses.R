@@ -11,7 +11,7 @@ library(huge)
 library(doParallel)
 library(pulsar)
 
-run_analysis <- function(simulations, method = "GEM") {
+run_analysis <- function(simulations, method = "GEM", p0 = 0) {
   n_datasets <- length(simulations)
   cores <- detectCores(logical = FALSE)
   if (tolower(method) == "gem") {
@@ -26,6 +26,9 @@ run_analysis <- function(simulations, method = "GEM") {
   else if (tolower(method) == "pulsar") {
     packages <- c("pulsar", "huge", "GHSGEM")
   }
+  else if (tolower(method) == "fastghs") {
+    packages <- c("fastGHS", "GHSGEM")
+  }
   else {
     stop("Wrong method!")
   }
@@ -36,7 +39,7 @@ run_analysis <- function(simulations, method = "GEM") {
                       .verbose = FALSE) %dopar% {
     sim <- simulations[[i]]
     if (tolower(method) == "gem") {
-      map <- GHS_MAP_estimate(sim$data, verbose = 0)
+      map <- GHS_MAP_estimation(sim$data, verbose = 0, p0 = p0, max_iterations = 1000, tol = 1e-4)
       theta_est <- map$Theta
       sigma_est <- map$Sigma_est
       omega_est <- map$Omega_est
@@ -70,24 +73,40 @@ run_analysis <- function(simulations, method = "GEM") {
       theta_est <- as.matrix(fit.p$refit$stars)
       diag(theta_est) <- 0
     }
+    else if (tolower(method) == "fastghs") {
+      n <- nrow(sim$data)
+      p <- ncol(sim$data)
+      tau <- p0 / (p * (p-1) / 2) * (50 * sqrt(p0) / (n * sqrt(n)))
+      fastghs_start <- Sys.time()
+      result <- fastGHS(sim$data, AIC_selection = FALSE, fix_tau = TRUE, tau_sq = tau, verbose = TRUE, epsilon = 1e-5)
+      time <- as.numeric(difftime(Sys.time(), fastghs_start, units = "secs"))
+      theta_est <- result$theta
+      theta_est[abs(theta_est) < 1e-5] <- 0
+      theta_est[theta_est != 0] <- 1
+      diag(theta_est) <- 0
+      omega_est <- result$theta
+      sigma_est <- result$sigma
+    }
     edge_count <- sum(theta_est) / 2
     cm <- conf_matrix(sim$theta, theta_est)
     sl_omega <- NA
     sl_sigma <- NA
     F_norm_sigma <- NA
     F_norm_omega <- NA
-    if (tolower(method) == "gem") {
+    F_norm_omega_normalised <- NA
+    if (tolower(method) == "gem" | tolower(method) == "fastghs") {
       sl_omega <- stein_loss(sim$omega, omega_est)
       sl_sigma <- stein_loss(sim$sigma, sigma_est)
       F_norm_omega <- norm(sim$omega - omega_est, type = "f")
       F_norm_sigma <- norm(sim$sigma - sigma_est, type = "f")
+      F_norm_omega_normalised <- F_norm_omega / norm(sim$omega, type = "f")
     }
     else if (tolower(method) == "glasso") {
       sl_omega <- stein_loss(sim$omega, omega_est)
       F_norm_omega <- norm(sim$omega - omega_est, type = "f")
     }
     score <- cbind(i, calculate_scores(cm), edge_count, sl_sigma, sl_omega, F_norm_sigma,
-                   F_norm_omega, time)
+                   F_norm_omega, F_norm_omega_normalised, time)
     score
   }
   total_time <- Sys.time() - start
@@ -96,11 +115,15 @@ run_analysis <- function(simulations, method = "GEM") {
   return(list(results = results, total_time = total_time))
 }
 
+structures <- c("random", "bdgraph_sf", "huge_sf", "hubs")
+
 # Analysis for the datasets with 100 variables.
 p <- 100
 
 # Change "path\\to\\data" part where you have stored datasets.
 path <- paste0("path\\to\\data\\p", p, "\\")
+
+path <- "C:\\Users\\thautama\\OneDrive - Oulun yliopisto\\Documents\\data\\Artikkeli\\p100\\"
 
 load(file = paste0(path, "bdgraph_random_", p, ".Rda"))
 load(file = paste0(path, "bdgraph_scale-free_", p, ".Rda"))
@@ -108,6 +131,7 @@ load(file = paste0(path, "huge_scale-free_", p, ".Rda"))
 load(file = paste0(path, "huge_hubs_", p, ".Rda"))
 
 random_p100_results <- run_analysis(sim_random)
+random_p100_results_2 <- run_analysis(sim_random, p0 = p/2)
 bdgraph_sf_p100_results <- run_analysis(sim_bdgraph_sf)
 huge_sf_p100_results <- run_analysis(sim_huge_sf)
 hubs_p100_results <- run_analysis(sim_hubs)
@@ -125,8 +149,34 @@ hubs_p100_glasso_results <- run_analysis(sim_hubs, "glasso")
 bdgraph_sf_p100_pulsar_results <- run_analysis(sim_bdgraph_sf, "pulsar")
 huge_sf_p100_pulsar_results <- run_analysis(sim_huge_sf, "pulsar")
 
-# Select scores which wanted to print.
-scores <- c("MCC", "F1", "TPR", "FPR", "FDR", "sl_omega", "F_norm_omega", "time")
+p0 <- p * (p - 1) / 2
+n <- 120
+p0 <- p*100
+p0 / (p * (p-1) / 2) * (50 * sqrt(p0) / (n * sqrt(n)))
+
+random_p100_fastghs_results <- run_analysis(sim_random, "fastGHS", p0 = p*2)
+bdgraph_sf_p100_fastghs_results <- run_analysis(sim_bdgraph_sf, "fastGHS", p0 = p*2)
+huge_sf_p100_fastghs_results <- run_analysis(sim_huge_sf, "fastGHS", p0 = p*100)
+hubs_p100_fastghs_results <- run_analysis(sim_hubs, "fastGHS", p0 = p*30)
+
+# Select scores which will be printed.
+scores <- c("MCC", "TPR", "FPR", "FDR", "sl_omega", "F_norm_omega", "F_norm_omega_normalised", "time")
+
+round(colMeans(random_p100_results$results[, scores]), 4)
+round(apply(random_p100_results$results[, scores], 2, sd), 4)
+
+round(colMeans(random_p100_results$results[, scores]), 4)
+round(colMeans(random_p100_results_2$results[, scores]), 4)
+round(colMeans(random_p100_fastghs_results$results[, scores]), 4)
+
+round(colMeans(bdgraph_sf_p100_results$results[, scores]), 4)
+round(colMeans(bdgraph_sf_p100_fastghs_results$results[, scores]), 4)
+
+round(colMeans(huge_sf_p100_results$results[, scores]), 4)
+round(colMeans(huge_sf_p100_fastghs_results$results[, scores]), 4)
+
+round(colMeans(hubs_p100_results$results[, scores]), 4)
+round(colMeans(hubs_p100_fastghs_results$results[, scores]), 4)
 
 # Print scores.
 round(rbind(colMeans(random_p100_results$results[, scores]),
@@ -144,6 +194,30 @@ round(rbind(colMeans(huge_sf_p100_results$results[, scores]),
 round(rbind(colMeans(hubs_p100_results$results[, scores]),
             colMeans(hubs_p100_glasso_results$results[, scores]),
             colMeans(hubs_p100_beam_results$results[, scores])), 4)
+
+
+# Create table for article usage.
+GEM_p100_means <- rbind(colMeans(random_p100_results$results[, scores]),
+                        colMeans(bdgraph_sf_p100_results$results[, scores]),
+                        colMeans(huge_sf_p100_results$results[, scores]),
+                        colMeans(hubs_p100_results$results[, scores]))
+
+GEM_p100_sds <- rbind(apply(random_p100_results$results[, scores], 2, sd),
+                      apply(bdgraph_sf_p100_results$results[, scores], 2, sd),
+                      apply(huge_sf_p100_results$results[, scores], 2, sd),
+                      apply(hubs_p100_results$results[, scores], 2, sd))
+
+GEM_p100_results <- data.frame(row.names = structures)
+
+for (i in 1:ncol(GEM_p100_means)) {
+  GEM_p100_results <- cbind(GEM_p100_results, GEM_p100_means[,i], GEM_p100_sds[,i])
+}
+columns <- c("MCC", "sd", "TPR", "sd", "FPR", "sd", "FDR", "sd", "sl_omega", "sd", "f_norm", "sd", "time", "sd")
+colnames(GEM_p100_results) <- columns
+round(GEM_p100_results, 3)
+
+round(GEM_p100_results[, 5:6], 4)
+
 
 # Save results into "Results_files" folder which is in the working directory.
 save(random_p100_results, file = "Results_files/random_p100_GEM_results.Rda")
@@ -175,7 +249,7 @@ load(file = paste0(path, "huge_hubs_", p, ".Rda"))
 
 n_datasets <- length(sim_random)
 
-random_p200_results <- run_analysis(sim_random)
+random_p200_results <- run_analysis(sim_random, p0 = p/2)
 bdgraph_sf_p200_results <- run_analysis(sim_bdgraph_sf)
 huge_sf_p200_results <- run_analysis(sim_huge_sf)
 hubs_p200_results <- run_analysis(sim_hubs)
@@ -190,8 +264,14 @@ bdgraph_sf_p200_glasso_results <- run_analysis(sim_bdgraph_sf, "glasso")
 huge_sf_p200_glasso_results <- run_analysis(sim_huge_sf, "glasso")
 hubs_p200_glasso_results <- run_analysis(sim_hubs, "glasso")
 
+######
+scores <- c("MCC", "TPR", "FPR", "FDR", "sl_omega", "F_norm_omega", "F_norm_omega_normalised", "time")
+
+round(colMeans(random_p200_results$results[, scores]), 4)
+round(apply(random_p200_results$results[, scores], 2, sd), 4)
+
 # Select scores which wanted to print.
-scores <- c("MCC", "F1", "TPR", "FPR", "FDR", "sl_omega", "F_norm_omega", "time")
+scores <- c("MCC", "TPR", "FPR", "FDR", "sl_omega", "F_norm_omega", "time")
 
 # Print scores.
 round(rbind(colMeans(random_p200_results$results[, scores]),
@@ -209,6 +289,30 @@ round(rbind(colMeans(huge_sf_p200_results$results[, scores]),
 round(rbind(colMeans(hubs_p200_results$results[, scores]),
             colMeans(hubs_p200_glasso_results$results[, scores]),
             colMeans(hubs_p200_beam_results$results[, scores])), 4)
+
+# Create table for article usage.
+GEM_p200_means <- rbind(colMeans(random_p200_results$results[, scores]),
+                        colMeans(bdgraph_sf_p200_results$results[, scores]),
+                        colMeans(huge_sf_p200_results$results[, scores]),
+                        colMeans(hubs_p200_results$results[, scores]))
+
+GEM_p200_sds <- rbind(apply(random_p200_results$results[, scores], 2, sd),
+                      apply(bdgraph_sf_p200_results$results[, scores], 2, sd),
+                      apply(huge_sf_p200_results$results[, scores], 2, sd),
+                      apply(hubs_p200_results$results[, scores], 2, sd))
+
+GEM_p200_results <- data.frame(row.names = structures)
+
+for (i in 1:ncol(GEM_p100_means)) {
+  GEM_p200_results <- cbind(GEM_p200_results, GEM_p200_means[,i], GEM_p200_sds[,i])
+}
+columns <- c("MCC", "sd", "TPR", "sd", "FPR", "sd", "FDR", "sd", "sl_omega", "sd", "f_norm", "sd", "time", "sd")
+colnames(GEM_p200_results) <- columns
+round(GEM_p200_results, 3)
+
+round(GEM_p200_results[, 5:6], 4)
+
+######
 
 save(random_p200_results, file = "Results_files/random_p200_GEM_results.Rda")
 save(bdgraph_sf_p200_results, file = "Results_files/bdgraph_sf_p200_GEM_results.Rda")
@@ -230,37 +334,37 @@ save(hubs_p200_beam_results, file = "Results_files/hubs_p200_beam_results.Rda")
 # Recalculate scores if analyses are already run and saved.
 # Load results files.
 
-load(file = "Results_files/random_p100_GEM_results.Rda")
-load(file = "Results_files/bdgraph_sf_p100_GEM_results.Rda")
-load(file = "Results_files/huge_sf_p100_GEM_results.Rda")
-load(file = "Results_files/hubs_p100_GEM_results.Rda")
+load(file = "Results_files/p100/GHSGEM/random_p100_GEM_results.Rda")
+load(file = "Results_files/p100/GHSGEM/bdgraph_sf_p100_GEM_results.Rda")
+load(file = "Results_files/p100/GHSGEM/huge_sf_p100_GEM_results.Rda")
+load(file = "Results_files/p100/GHSGEM/hubs_p100_GEM_results.Rda")
 
-load(file = "Results_files/random_p100_glasso_results.Rda")
-load(file = "Results_files/bdgraph_sf_p100_glasso_results.Rda")
-load(file = "Results_files/huge_sf_p100_glasso_results.Rda")
-load(file = "Results_files/hubs_p100_glasso_results.Rda")
+load(file = "Results_files/p100/glasso/random_p100_glasso_results.Rda")
+load(file = "Results_files/p100/glasso/bdgraph_sf_p100_glasso_results.Rda")
+load(file = "Results_files/p100/glasso/huge_sf_p100_glasso_results.Rda")
+load(file = "Results_files/p100/glasso/hubs_p100_glasso_results.Rda")
 
-load(file = "Results_files/random_p100_beam_results.Rda")
-load(file = "Results_files/bdgraph_sf_p100_beam_results.Rda")
-load(file = "Results_files/huge_sf_p100_beam_results.Rda")
-load(file = "Results_files/hubs_p100_beam_results.Rda")
+load(file = "Results_files/p100/beam/random_p100_beam_results.Rda")
+load(file = "Results_files/p100/beam/bdgraph_sf_p100_beam_results.Rda")
+load(file = "Results_files/p100/beam/huge_sf_p100_beam_results.Rda")
+load(file = "Results_files/p100/beam/hubs_p100_beam_results.Rda")
 
-load(file = "Results_files/random_p200_GEM_results.Rda")
-load(file = "Results_files/bdgraph_sf_p200_GEM_results.Rda")
-load(file = "Results_files/huge_sf_p200_GEM_results.Rda")
-load(file = "Results_files/hubs_p200_GEM_results.Rda")
+load(file = "Results_files/p200/GHSGEM/random_p200_GEM_results.Rda")
+load(file = "Results_files/p200/GHSGEM/bdgraph_sf_p200_GEM_results.Rda")
+load(file = "Results_files/p200/GHSGEM/huge_sf_p200_GEM_results.Rda")
+load(file = "Results_files/p200/GHSGEM/hubs_p200_GEM_results.Rda")
 
-load(file = "Results_files/random_p200_glasso_results.Rda")
-load(file = "Results_files/bdgraph_sf_p200_glasso_results.Rda")
-load(file = "Results_files/huge_sf_p200_glasso_results.Rda")
-load(file = "Results_files/hubs_p200_glasso_results.Rda")
+load(file = "Results_files/p200/glasso/random_p200_glasso_results.Rda")
+load(file = "Results_files/p200/glasso/bdgraph_sf_p200_glasso_results.Rda")
+load(file = "Results_files/p200/glasso/huge_sf_p200_glasso_results.Rda")
+load(file = "Results_files/p200/glasso/hubs_p200_glasso_results.Rda")
 
-load(file = "Results_files/random_p200_beam_results.Rda")
-load(file = "Results_files/bdgraph_sf_p200_beam_results.Rda")
-load(file = "Results_files/huge_sf_p200_beam_results.Rda")
-load(file = "Results_files/hubs_p200_beam_results.Rda")
+load(file = "Results_files/p200/beam/random_p200_beam_results.Rda")
+load(file = "Results_files/p200/beam/bdgraph_sf_p200_beam_results.Rda")
+load(file = "Results_files/p200/beam/huge_sf_p200_beam_results.Rda")
+load(file = "Results_files/p200/beam/hubs_p200_beam_results.Rda")
 
-scores <- c("MCC", "F1", "TPR", "FPR", "FDR", "sl_omega", "F_norm_omega", "time")
+scores <- c("MCC", "TPR", "FPR", "FDR", "sl_omega", "F_norm_omega", "time")
 
 # Means of the scores:
 # p = 100.
@@ -391,3 +495,56 @@ as.double(hubs_p200_results$total_time, units = "secs")
 as.double(hubs_p200_glasso_results$total_time, units = "secs")
 hubs_p200_beam_results$total_time
 
+
+#######
+# Calculate relative F-norms.
+# p = 100
+
+GEM_random <- GEM_bdgraph <- GEM_huge <- GEM_hubs  <- c()
+for (i in 1:50) {
+  GEM_random[i] <- random_p100_results$results[i, "F_norm_omega"] / norm(sim_random[[i]]$omega, type = "f")
+  GEM_bdgraph[i] <- bdgraph_sf_p100_results$results[i, "F_norm_omega"] / norm(sim_bdgraph_sf[[i]]$omega, type = "f")
+  GEM_huge[i] <- huge_sf_p100_results$results[i, "F_norm_omega"] / norm(sim_huge_sf[[i]]$omega, type = "f")
+  GEM_hubs[i] <- hubs_p100_results$results[i, "F_norm_omega"] / norm(sim_hubs[[i]]$omega, type = "f")
+}
+
+GLASSO_random <- GLASSO_bdgraph <- GLASSO_huge <- GLASSO_hubs  <- c()
+for (i in 1:50) {
+  GLASSO_random[i] <- random_p100_glasso_results$results[i, "F_norm_omega"] / norm(sim_random[[i]]$omega, type = "f")
+  GLASSO_bdgraph[i] <- bdgraph_sf_p100_glasso_results$results[i, "F_norm_omega"] / norm(sim_bdgraph_sf[[i]]$omega, type = "f")
+  GLASSO_huge[i] <- huge_sf_p100_glasso_results$results[i, "F_norm_omega"] / norm(sim_huge_sf[[i]]$omega, type = "f")
+  GLASSO_hubs[i] <- hubs_p100_glasso_results$results[i, "F_norm_omega"] / norm(sim_hubs[[i]]$omega, type = "f")
+}
+
+
+round(cbind(rbind(mean(GEM_random), mean(GEM_bdgraph), mean(GEM_huge), mean(GEM_hubs)),
+            rbind(sd(GEM_random), sd(GEM_bdgraph), sd(GEM_huge), sd(GEM_hubs))), 3)
+
+round(cbind(rbind(mean(GLASSO_random), mean(GLASSO_bdgraph), mean(GLASSO_huge), mean(GLASSO_hubs)),
+            rbind(sd(GLASSO_random), sd(GLASSO_bdgraph), sd(GLASSO_huge), sd(GLASSO_hubs))), 3)
+
+
+# p = 200
+
+GEM_p200_random <- GEM_p200_bdgraph <- GEM_p200_huge <- GEM_p200_hubs  <- c()
+for (i in 1:50) {
+  GEM_p200_random[i] <- random_p200_results$results[i, "F_norm_omega"] / norm(sim_random[[i]]$omega, type = "f")
+  GEM_p200_bdgraph[i] <- bdgraph_sf_p200_results$results[i, "F_norm_omega"] / norm(sim_bdgraph_sf[[i]]$omega, type = "f")
+  GEM_p200_huge[i] <- huge_sf_p200_results$results[i, "F_norm_omega"] / norm(sim_huge_sf[[i]]$omega, type = "f")
+  GEM_p200_hubs[i] <- hubs_p200_results$results[i, "F_norm_omega"] / norm(sim_hubs[[i]]$omega, type = "f")
+}
+
+GLASSO_p200_random <- GLASSO_p200_bdgraph <- GLASSO_p200_huge <- GLASSO_p200_hubs  <- c()
+for (i in 1:50) {
+  GLASSO_p200_random[i] <- random_p200_glasso_results$results[i, "F_norm_omega"] / norm(sim_random[[i]]$omega, type = "f")
+  GLASSO_p200_bdgraph[i] <- bdgraph_sf_p200_glasso_results$results[i, "F_norm_omega"] / norm(sim_bdgraph_sf[[i]]$omega, type = "f")
+  GLASSO_p200_huge[i] <- huge_sf_p200_glasso_results$results[i, "F_norm_omega"] / norm(sim_huge_sf[[i]]$omega, type = "f")
+  GLASSO_p200_hubs[i] <- hubs_p200_glasso_results$results[i, "F_norm_omega"] / norm(sim_hubs[[i]]$omega, type = "f")
+}
+
+
+round(cbind(rbind(mean(GEM_p200_random), mean(GEM_p200_bdgraph), mean(GEM_p200_huge), mean(GEM_p200_hubs)),
+            rbind(sd(GEM_p200_random), sd(GEM_p200_bdgraph), sd(GEM_p200_huge), sd(GEM_p200_hubs))), 3)
+
+round(cbind(rbind(mean(GLASSO_p200_random), mean(GLASSO_p200_bdgraph), mean(GLASSO_p200_huge), mean(GLASSO_p200_hubs)),
+            rbind(sd(GLASSO_p200_random), sd(GLASSO_p200_bdgraph), sd(GLASSO_p200_huge), sd(GLASSO_p200_hubs))), 3)
