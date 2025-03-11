@@ -3,25 +3,38 @@ library(GHSGEM)
 source("network_visualisation_and_scores.R")
 
 ######
-# Create dataset with 100 variables and save it as csv file
+# Uncomment lines 10 to 33 to if the CEU dataset is not yet created.
 
-# data1 <- read.csv("C:\\Users\\thautama\\OneDrive - Oulun yliopisto\\Documents\\data\\genevar\\CEU_parents-normalised.csv")
+# Create dataset with 100 variables and save it as csv file.
+# Read normalized dataset from the csv-file.
+# data1 <- read.csv("Data/CEU_dataset/CEU_parents-normalised.csv")
 # 
+## Extract variable names from the first column.
 # varnames <- data1[,1]
+## Remove variable names.
 # data1 <- data1[,-1]
+## Transpose dataset.
 # data1 <- t(data1)
+## Set variable names to the column names.
 # colnames(data1) <- varnames
 # 
+## Calculate variances.
 # variances <- apply(data1, 2, var)
+## Check the threshold which gives 100 variables.
 # sum(variances > 1.35)
 # 
+## Extract those variables into own dataset.
 # data2 <- data1[, variances > 1.35]
 # 
+## Transform dataset using huge.npn().
 # data_npn <- huge.npn(data2)
+#
+## Write dataset into csv-file.
+# write.csv(data_npn, file = "Data/CEU_dataset/CEU_parents_npn.csv", row.names = FALSE)
 
 ######
 # Read new, transformed dataset
-data_npn <- as.matrix(read.csv(file = "C:\\Users\\thautama\\OneDrive - Oulun yliopisto\\Documents\\data\\genevar\\CEU_parents_npn.csv"))
+data_npn <- as.matrix(read.csv(file = "Data/CEU_parents_npn.csv"))
 
 # Data dimensions
 n <- nrow(data_npn)
@@ -29,17 +42,17 @@ p <- ncol(data_npn)
 
 ######
 # Run GHS GEM algorithm
-GHSGEM_MAP <- GHS_MAP_estimation(data_npn, verbose = 1, max_iterations = 500)
+GHSGEM_MAP <- GHS_MAP_estimation(data_npn, verbose = 1)
 
 ######
 # Read adjacency matrices of other methods
-GHS_MCMC_Theta <- as.matrix(read.csv("C:\\Users\\thautama\\OneDrive - Oulun yliopisto\\Documents\\Tuloksia\\CEU_data_npn_GHS_MCMC_Theta.txt",
+GHS_MCMC_Theta <- as.matrix(read.csv("Results_files/CEU_dataset/CEU_data_npn_GHS_MCMC_Theta.txt",
                                      header = FALSE))
 
-GHS_LLA_Theta <- as.matrix(read.csv("C:\\Users\\thautama\\OneDrive - Oulun yliopisto\\Documents\\Tuloksia\\CEU_data_npn_GHS_LLA_Theta.txt",
+GHS_LLA_Theta <- as.matrix(read.csv("Results_files/CEU_dataset/CEU_data_npn_GHS_LLA_Theta.txt",
                                     header = FALSE))
 
-GHSl_ECM_Theta <- as.matrix(read.csv("C:\\Users\\thautama\\OneDrive - Oulun yliopisto\\Documents\\Tuloksia\\CEU_data_npn_GHSl_ECM_Theta.txt",
+GHSl_ECM_Theta <- as.matrix(read.csv("Results_files/CEU_dataset/CEU_data_npn_GHSl_ECM_Theta.txt",
                                      header = FALSE))
 
 colnames(GHS_MCMC_Theta) <- rownames(GHS_MCMC_Theta) <- 1:p
@@ -71,7 +84,7 @@ sum(GHSl_ECM_degrees > 0)
 set.seed(8)
 ceu_coords <- igraph::layout_with_fr(igraph::graph_from_adjacency_matrix(GHSGEM_MAP$Theta,
                                                                          mode = "undirected",
-                                                                         diag = F))
+                                                                         diag = FALSE))
 
 # Plot network estimates
 setEPS()
@@ -98,8 +111,8 @@ names(GHS_GEM_degrees) <- names(GHS_MCMC_degrees) <- 1:p
 
 # Calculate how many nodes with the highest degree are the same
 same_nodes <- c()
-for (n1 in names(GHS_GEM_degrees[order(GHS_GEM_degrees)][95:100])) {
-  for (n2 in names(GHS_MCMC_degrees[order(GHS_MCMC_degrees)][95:100])) {
+for (n1 in names(GHS_GEM_degrees[order(GHS_GEM_degrees, decreasing = TRUE)][1:6])) {
+  for (n2 in names(GHS_MCMC_degrees[order(GHS_MCMC_degrees, decreasing = TRUE)][1:6])) {
     if (n1 == n2) {
       same_nodes <- c(same_nodes, n1)
     }
@@ -108,7 +121,7 @@ for (n1 in names(GHS_GEM_degrees[order(GHS_GEM_degrees)][95:100])) {
 same_nodes
 
 # Highest degrees
-GHS_GEM_degrees[order(GHS_GEM_degrees)][95:100]
-GHS_MCMC_degrees[order(GHS_MCMC_degrees)][95:100]
-GHS_LLA_degrees[order(GHS_LLA_degrees)][95:100]
-GHSl_ECM_degrees[order(GHSl_ECM_degrees)][95:100]
+GHS_GEM_degrees[order(GHS_GEM_degrees, decreasing = TRUE)][1:6]
+GHS_MCMC_degrees[order(GHS_MCMC_degrees, decreasing = TRUE)][1:6]
+GHS_LLA_degrees[order(GHS_LLA_degrees, decreasing = TRUE)][1:6]
+GHSl_ECM_degrees[order(GHSl_ECM_degrees, decreasing = TRUE)][1:6]
