@@ -9,36 +9,38 @@ source("./network_visualisation_and_scores.R")
 
 # Combine the pathways, create a dataset with unique variables and save it as a csv file.
 # Load rda-file.
-# load("Data/DLBC_dataset/rppadat_DLBC.rda")
-# 
-# # Combine pathways.
-# rppa_data <- data.frame(row.names = c(1:33))
-# for (i in 1:12) {
-#   rppa_data <- cbind(rppa_data, rppadat[[i]])
-# }
-# 
-# # Select unique variable names.
-# var_names <- unique(colnames(rppa_data))
-# 
-# # Check that length of the variable names is 67.
-# length(var_names)
-# 
-# # Select variables and convert data to a matrix.
-# rppa_data <- as.matrix(rppa_data[, var_names])
-# 
-# # Data dimensions
-# n <- nrow(rppa_data)
-# p <- ncol(rppa_data)
-# 
-# # Transform data using huge.npn().
-# data_npn <- huge::huge.npn(rppa_data)
-# 
-# # Write dataset to the csv-file.
-# write.csv(data_npn, "Data/DLBC_dataset/rppadat_DLBC_npn.csv", row.names = FALSE)
+if(!file.exists("Data/DLBC_dataset/rppadat_DLBC_npn.csv")) {
+  load("Data/DLBC_dataset/rppadat_DLBC.rda")
+  
+  # Combine pathways.
+  rppa_data <- data.frame(row.names = c(1:33))
+  for (i in 1:12) {
+    rppa_data <- cbind(rppa_data, rppadat[[i]])
+  }
+  
+  # Select unique variable names.
+  var_names <- unique(colnames(rppa_data))
+  
+  # Check that length of the variable names is 67.
+  length(var_names)
+  
+  # Select variables and convert data to a matrix.
+  rppa_data <- as.matrix(rppa_data[, var_names])
+  
+  # Data dimensions
+  n <- nrow(rppa_data)
+  p <- ncol(rppa_data)
+  
+  # Transform data using huge.npn().
+  data_npn <- huge::huge.npn(rppa_data)
+  
+  # Write dataset to the csv-file.
+  write.csv(data_npn, "Data/DLBC_dataset/rppadat_DLBC_npn.csv", row.names = FALSE)
+}
 
 ######
 # Read new, transformed dataset
-data_npn <- as.matrix(read.csv(file = "Data/CEU_parents_npn.csv"))
+data_npn <- as.matrix(read.csv(file = "Data/DLBC_dataset/rppadat_DLBC_npn.csv"))
 
 # Data dimensions
 n <- nrow(rppa_data)
@@ -91,7 +93,7 @@ ceu_coords <- igraph::layout_with_fr(igraph::graph_from_adjacency_matrix(GHSGEM_
 
 # Plot network estimates
 setEPS()
-postscript("CEU_network_estimates.eps", width = 20, height = 5)
+postscript("/Figures/DLBC_network_estimates.eps", width = 20, height = 5)
 par(mfrow = c(1,4))
 plot_network(GHSGEM_MAP$Theta, layout = ceu_coords, node_size = GHS_GEM_degrees*1.5,
              node_labels = NA, margins = c(0,0,0,0))
@@ -129,85 +131,3 @@ GHS_MCMC_degrees[order(GHS_MCMC_degrees, decreasing = TRUE)][1:10]
 GHS_LLA_degrees[order(GHS_LLA_degrees, decreasing = TRUE)][1:10]
 GHSl_ECM_degrees[order(GHSl_ECM_degrees, decreasing = TRUE)][1:10]
 
-
-
-
-########
-
-ghs_mcmc_theta <- as.matrix(read.csv("C:\\Users\\thautama\\OneDrive - Oulun yliopisto\\Documents\\Tuloksia\\DLBC_data_GHS_MCMC_Theta_50_CI.txt",
-                                     header = FALSE))
-ghs_mcmc_theta <- as.matrix(read.csv("C:\\Users\\thautama\\OneDrive - Oulun yliopisto\\Documents\\Tuloksia\\DLBC_data_scaled_GHS_MCMC_Theta_50_CI.txt",
-                                     header = FALSE))
-ghsl_ecm_theta <- as.matrix(read.csv("C:\\Users\\thautama\\OneDrive - Oulun yliopisto\\Documents\\Tuloksia\\DLBC_npn_data_GHSl_ECM_Theta.txt",
-                                     header = FALSE))
-ghs_lla_ll_theta <- as.matrix(read.csv("C:\\Users\\thautama\\OneDrive - Oulun yliopisto\\Documents\\Tuloksia\\DLBC_npn_data_GHS_LLA_ll_Theta.txt",
-                                       header = FALSE))
-ghs_lla_c_theta <- as.matrix(read.csv("C:\\Users\\thautama\\OneDrive - Oulun yliopisto\\Documents\\Tuloksia\\DLBC_npn_data_GHS_LLA_c_Theta.txt",
-                                       header = FALSE))
-
-gem_degrees <- colSums(bcell_map3$Theta)
-#gem_degrees <- colSums(bcell_map2$Theta)
-mcmc_degrees <- colSums(ghs_mcmc_theta)
-ecm_degrees <- colSums(ghsl_ecm_theta)
-lla_degrees <- colSums(ghs_lla_ll_theta)
-
-names(gem_degrees) <- names(mcmc_degrees) <- 1:p
-
-sum(bcell_map3$Theta) / 2
-sum(bcell_map2$Theta) / 2
-sum(ghs_mcmc_theta) / 2
-sum(ghs_lla_c_theta) / 2
-sum(ghs_lla_ll_theta) / 2
-sum(ghsl_ecm_theta) / 2
-
-
-set.seed(13)
-net_coords <- igraph::layout_with_fr(graph_from_adjacency_matrix(bcell_map3$Theta, mode = "undirected", diag = F))
-
-setEPS()
-postscript("DLBC_network_estimates.eps", width = 20, height = 5)
-par(mfrow = c(1,4))
-plot_network(bcell_map3$Theta, layout = net_coords, margins = c(0, 0, 0, 0), node_labels = NA, node_size = gem_degrees, delete_isolates = FALSE)
-plot_network(ghs_mcmc_theta, layout = net_coords, margins = c(0, 0, 0, 0), node_labels = NA, node_size = mcmc_degrees, delete_isolates = FALSE)
-plot_network(ghs_lla_ll_theta, layout = net_coords, margins = c(0, 0, 0, 0), node_labels = NA, node_size = lla_degrees, delete_isolates = FALSE)
-plot_network(ghsl_ecm_theta, layout = net_coords, margins = c(0, 0, 0, 0), node_labels = NA, node_size = ecm_degrees, delete_isolates = FALSE)
-dev.off()
-
-
-par(mfrow = c(1,2))
-par(mar = c(5.1, 4.1, 2.1, 2.1))
-hist(gem_degrees)
-hist(mcmc_degrees)
-hist(ecm_degrees)
-hist(lla_degrees)
-
-gem_degrees[order(gem_degrees, decreasing = TRUE)][1:10]
-mcmc_degrees[order(mcmc_degrees, decreasing = TRUE)][1:10]
-ecm_degrees[order(ecm_degrees, decreasing = TRUE)][1:10]
-lla_degrees[order(lla_degrees, decreasing = TRUE)][1:10]
-
-same <- c()
-for (dg1 in names(gem_degrees[order(gem_degrees, decreasing = TRUE)][1:10])) {
-  for (dg2 in names(mcmc_degrees[order(mcmc_degrees, decreasing = TRUE)][1:10])) {
-    if (dg1 == dg2) {
-      same <- c(same, dg1)
-    }
-  }
-}
-
-same
-
-##########
-
-conf_matrix(bcell_map3$Theta, ghs_mcmc_theta)
-
-conf_matrix(bcell_map3$Theta, ghs_lla_c_theta)
-conf_matrix(bcell_map3$Theta, ghs_lla_ll_theta)
-
-conf_matrix(bcell_map3$Theta, ghsl_ecm_theta)
-
-conf_matrix(ghs_lla_c_theta, ghsl_ecm_theta)
-conf_matrix(ghs_lla_ll_theta, ghsl_ecm_theta)
-
-#######
-similarity_plots(bcell_map3$Theta, ghs_mcmc_theta)

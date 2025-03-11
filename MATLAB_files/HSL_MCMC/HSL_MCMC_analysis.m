@@ -1,35 +1,37 @@
 clearvars;
 
-total_sets = 50;
+% Initialize number of datasets.
+n_datasets = 50;
 
-all_scores = table('Size', [total_sets,20], 'VariableTypes', ["double", "double", "double", "double", "double", "double", "double", ...
-      "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"], ...
+% Initialize tables for all results and total times.
+all_scores = table('Size', [n_datasets, 21], 'VariableTypes', ["double", "double", "double", "double", "double", "double", "double", ...
+      "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"], ...
       'VariableNames', ["ACC", "ACC_bal", "MCC", "F1", "TPR", "TNR", "PPV", ...
-      "NPV", "FPR", "FNR", "FDR", "FOR", "LRp", "LRn", "sl_omega", "f_norm", "edge_count", "n", "round", "time"]);
+      "NPV", "FPR", "FNR", "FDR", "FOR", "LRp", "LRn", "sl_omega", "f_norm", "f_norm_rel", "edge_count", "n", "round", "time"]);
 
-%% Set what wanted to run
-n = 120;
-%ps = [100, 200];
-ps = 100;
-structures = ["random", "bdgraph_sf", "huge_sf", "hubs"];
-%structures = ["random", "bdgraph_sf"];
-
-%% Initialize parallel pool
-parfor i = 1:50
-    1+1;
-end
-
-%%
 total_times = table('Size', [0, 3], 'VariableTypes', ["double", "string", "double"], 'VariableNames', ["p", "structure", "time"]);
+
+%% Initialize parfor.
+y = ones(1,100);
+parfor (i = 1:100)
+     y(i) = i;
+end
+clear y;
+
+%% Initialize needed parameters.
+n = 120;
+ps = [100, 200];
+structures = ["random", "bdgraph_sf", "huge_sf", "hubs"];
+path_tot_times = '..\..\Results_files\';
+
+%% Run all analyzes.
 for p = ps
-    %path_data = ['C:\Users\tume8\Documents\data\Artikkeli\p', num2str(p), '\'];
-    path_data = ['C:\Users\thautama\OneDrive - Oulun yliopisto\Documents\data\Artikkeli\p', num2str(p), '\'];
-    %path_res = ['C:\Users\tume8\Documents\Tuloksia\Artikkeli\p' num2str(p), '\GHS_MCMC\'];
-    path_res = ['C:\Users\thautama\OneDrive - Oulun yliopisto\Documents\Tuloksia\Artikkeli\p' num2str(p), '\GHS_MCMC\'];
+    path_data = ['..\..\Data\n', num2str(n) '_p', num2str(p), '\'];
+    path_res = ['..\..\Results_files\p' num2str(p), '\HSL_MCMC\'];
     for structure = structures
         t_start = tic;
         struct_char = char(structure);
-        parfor r = 1:total_sets
+        parfor r = 1:n_datasets
             datanro = r;
             fprintf('Dataset %d is in process.\n',datanro);
             datafile = [path_data, struct_char, '\', struct_char, '_data_nro_', num2str(datanro), '.csv'];
@@ -53,7 +55,7 @@ for p = ps
             S = data'*data;
         
             t2 = tic;
-            [GHS_omega, ~] = GHS(S, n, 1000, 5000, 0);
+            [GHS_omega, ~] = HSL_MCMC(S, n, 1000, 5000);
             time = toc(t2)
             Omega_mean = mean(GHS_omega, 3);
             
@@ -76,10 +78,10 @@ for p = ps
             end
         
             cm = conf_matrix(theta, a_mat);
-            scores = table('Size', [1,20], 'VariableTypes', ["double", "double", "double", "double", "double", "double", "double", ...
+            scores = table('Size', [1,21], 'VariableTypes', ["double", "double", "double", "double", "double", "double", "double", "double", ...
                 "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"], ...
                 'VariableNames', ["ACC", "ACC_bal", "MCC", "F1", "TPR", "TNR", "PPV", ...
-                "NPV", "FPR", "FNR", "FDR", "FOR", "LRp", "LRn", "sl_omega", "f_norm", "edge_count", "n", "round", "time"]);
+                "NPV", "FPR", "FNR", "FDR", "FOR", "LRp", "LRn", "sl_omega", "f_norm", "f_norm_rel", "edge_count", "n", "round", "time"]);
         
             scores(1, 1:14) = calculate_scores(cm);
             scores(1, "n") = {n};
@@ -88,6 +90,7 @@ for p = ps
             sl_omega = stein_loss(omega, Omega_mean);
             scores(1, "sl_omega") = {sl_omega};
             scores(1, "f_norm") = {norm(omega - Omega_mean, "fro")};
+            scores(1, "f_norm_rel") = {norm(omega - Omega_mean, "fro") / norm(omega, "fro")};
             scores(1, "time") = {time}
             all_scores(r,:) = scores;
             fprintf('Dataset %d finished \n',datanro);
@@ -97,5 +100,7 @@ for p = ps
     end
 end
 
+%% Write total times into csv-file.
+writetable(total_times, [path_tot_times, 'HSL_MCMC_total_times.csv'])
 
 

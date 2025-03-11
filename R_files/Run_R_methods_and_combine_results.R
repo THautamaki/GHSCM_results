@@ -30,8 +30,8 @@ library(fastGHS)
 library(doParallel)
 library(pulsar)
 
-source("Generate_datasets.R")
-source("Functions_for_R_methods_and_combining_results.R")
+source("R_files/Generate_datasets.R")
+source("R_files/Functions_for_R_methods_and_combining_results.R")
 
 # Generate the datasets if not yet generated.
 generate_datasets()
