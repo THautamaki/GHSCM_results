@@ -3,9 +3,9 @@ output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.path = "man/figures/README-", out.width = "100%")
 ```
 
-# Results of the article "Gene co-expression network estimation using GEM with GHS prior" 
+# Results of the article: Gene co-expression network estimation using GEM with GHS prior
 
-This repository contains all codes which are used to produce the results for the article \emph{Gene co-expression network estimation using generalized expectation-maximization algorithm with graphical horseshoe prior}.
+This repository contains all codes that are used to produce the results for the article *Gene co-expression network estimation using generalized expectation-maximization algorithm with graphical horseshoe prior*.
