@@ -1,104 +1,115 @@
-library(huge)
-library(BDgraph)
-
-# Number of observations (sample size).
-n <- 120
-# Number of variables.
-ps <- c(100, 200)
-# Number of datasets.
-n_datasets <- 50
-
-save_datasets <- FALSE
-
-for (p in ps) {
-  # Folder where to save datasets. Change "path\\to\\folder" part where you want to save files.
-  path <- paste0("path\\to\\folder\\p", p, "\\")
-  
-  # Initialise list where to save simulations.
-  sim_random <- list()
-  sim_bdgraph_sf <- list()
-  sim_huge_sf <- list()
-  sim_hubs <- list()
-  
-  for (i in 1:n_datasets) {
-    # Set seed so same datasets can be generated again.
-    seed <- 20241202 + i + p
-    set.seed(seed)
-    # Generate simulated dataset for random structure using bdgraph.sim function.
-    sim <- bdgraph.sim(p = p, n = n, graph = "random", size = p/2)
-    sim$omega <- sim$K
-    sim$theta <- sim$G
-    sim_random[[i]] <- sim
-    
-    # Set seed so same datasets can be generated again.
-    seed <- 20251202 + i + p
-    # Generate simulated dataset for random structure using bdgraph.sim function.
-    sim <- bdgraph.sim(p = p, n = n, graph = "scale-free")
-    sim$omega <- sim$K
-    sim$theta <- sim$G
-    sim_bdgraph_sf[[i]] <- sim
-    
-    # Set seed so same datasets can be generated again.
-    seed <- 20261202 + i + p
-    # Generate simulated dataset for random structure using bdgraph.sim function.
-    sim <- huge.generator(n = n, d = p, graph = "scale-free")
-    sim_huge_sf[[i]] <- sim
-    
-    # Set seed so same datasets can be generated again.
-    seed <- 20271202 + i + p
-    # Generate simulated dataset for random structure using bdgraph.sim function.
-    sim <- huge.generator(n = n, d = p, graph = "hub")
-    sim_hubs[[i]] <- sim
-  }
-  if (save_datasets) {
-    save(sim_random, file = paste0(path, "bdgraph_random_", p, ".Rda"))
-    save(sim_bdgraph_sf, file = paste0(path, "bdgraph_scale-free_", p, ".Rda"))
-    save(sim_huge_sf, file = paste0(path, "huge_scale-free_", p, ".Rda"))
-    save(sim_hubs, file = paste0(path, "huge_hubs_", p, ".Rda"))
-  }
-}
-
-# Save necessary data also as csv-format for Matlab use.
-if (save_datasets) {
-  for (p in ps) {
-    # Path to folder where datasets are saved. Change "path\\to\\folder" part where you want to save and
-    # load files.
-    path <- paste0("path\\to\\folder\\p", p, "\\")
-    
-    # Load datasets.
-    load(file = paste0(path, "bdgraph_random_", p, ".Rda"))
-    load(file = paste0(path, "bdgraph_scale-free_", p, ".Rda"))
-    load(file = paste0(path, "huge_scale-free_", p, ".Rda"))
-    load(file = paste0(path, "huge_hubs_", p, ".Rda"))
-    for (i in 1:n_datasets) {
-      # Datasets with random structure from BDgraph.
-      sim <- sim_random[[i]]
-      write.csv(sim$data, paste0(path, "random\\random_data_nro_", i, ".csv"), row.names = FALSE)
-      write.csv(sim$sigma, paste0(path, "random\\random_sigma_nro_", i, ".csv"), row.names = FALSE)
-      write.csv(sim$omega, paste0(path, "random\\random_omega_nro_", i, ".csv"), row.names = FALSE)
-      write.csv(sim$theta, paste0(path, "random\\random_theta_nro_", i, ".csv"), row.names = FALSE)
+generate_datasets <- function(sample_sizes = 120, variable_numbers = c(100, 200), n_datasets = 50,
+                              save_datasets = TRUE, return = FALSE) {
+  # Initialize list for return.
+  simulations <- list()
+  for (n in sample_sizes) {
+    for (p in variable_numbers) {
+      cat(paste0("Creating datasets with dimensions n = ", n, " and p = ", p, ".\n"))
+      # Folders where to save datasets. The default is to save these /Data/nxxx_pxxx/structure folder
+      # into the working directory. The function creates these, if they not exists.
+      if(!file.exists("Data")) {
+        dir.create(file.path(getwd(), "Data"))
+      }
+      path <- paste0("Data/n", n, "_p", p)
+      if (!file.exists(path)) {
+        dir.create(file.path(getwd(), path))
+      }
+      if (!file.exists(paste0(path, "/random"))) {
+        dir.create(file.path(getwd(), path, "random"))
+      }
+      if (!file.exists(paste0(path, "/bdgraph_sf"))) {
+        dir.create(file.path(getwd(), path, "bdgraph_sf"))
+      }
+      if (!file.exists(paste0(path, "/huge_sf"))) {
+        dir.create(file.path(getwd(), path, "huge_sf"))
+      }
+      if (!file.exists(paste0(path, "/hubs"))) {
+        dir.create(file.path(getwd(), path, "hubs"))
+      }
+      # Initialise list where to save simulations.
+      simulations[[paste0("n", n, "_p", p)]][["random"]]
+      simulations[[paste0("n", n, "_p", p)]][["bdgraph_sf"]]
+      simulations[[paste0("n", n, "_p", p)]][["huge_sf"]]
+      simulations[[paste0("n", n, "_p", p)]][["hubs"]]
       
-      # Datasets with scale-free structure from BDgraph.
-      sim <- sim_bdgraph_sf[[i]]
-      write.csv(sim$data, paste0(path, "bdgraph_scale-free\\bdgraph_sf_data_nro_", i, ".csv"), row.names = FALSE)
-      write.csv(sim$sigma, paste0(path, "bdgraph_scale-free\\bdgraph_sf_sigma_nro_", i, ".csv"), row.names = FALSE)
-      write.csv(sim$omega, paste0(path, "bdgraph_scale-free\\bdgraph_sf_omega_nro_", i, ".csv"), row.names = FALSE)
-      write.csv(sim$theta, paste0(path, "bdgraph_scale-free\\bdgraph_sf_theta_nro_", i, ".csv"), row.names = FALSE)
+      for (i in 1:n_datasets) {
+        cat(paste0("Creating dataset nro ", i, ".\n"))
+        # Set seed so the same datasets can be generated again.
+        seed <- 20241202 + i + p
+        set.seed(seed)
+        # Generate simulated dataset with random structure using bdgraph.sim function.
+        sim1 <- BDgraph::bdgraph.sim(p = p, n = n, graph = "random", size = floor(p/2))
+        sim1$omega <- sim1$K
+        sim1$theta <- sim1$G
+        simulations[[paste0("n", n, "_p", p)]][["random"]][[i]] <- sim1
+        
+        # Set seed so the same datasets can be generated again.
+        seed <- 20251202 + i + p
+        # Generate simulated dataset with random structure using bdgraph.sim function.
+        sim2 <- BDgraph::bdgraph.sim(p = p, n = n, graph = "scale-free")
+        sim2$omega <- sim2$K
+        sim2$theta <- sim2$G
+        simulations[[paste0("n", n, "_p", p)]][["bdgraph_sf"]][[i]] <- sim2
+        
+        # Set seed so the same datasets can be generated again.
+        seed <- 20261202 + i + p
+        # Generate simulated dataset with random structure using bdgraph.sim function.
+        sim3 <- huge::huge.generator(n = n, d = p, graph = "scale-free", verbose = FALSE)
+        simulations[[paste0("n", n, "_p", p)]][["huge_sf"]][[i]] <- sim3
+        
+        # Set seed so the same datasets can be generated again.
+        seed <- 20271202 + i + p
+        # Generate simulated dataset with random structure using bdgraph.sim function.
+        sim4 <- huge::huge.generator(n = n, d = p, graph = "hub", verbose = FALSE)
+        simulations[[paste0("n", n, "_p", p)]][["hubs"]][[i]] <- sim4
+      }
       
-      # Datasets with scale-free structure from huge.
-      sim <- sim_huge_sf[[i]]
-      write.csv(sim$data, paste0(path, "huge_scale-free\\huge_sf_data_nro_", i, ".csv"), row.names = FALSE)
-      write.csv(sim$sigma, paste0(path, "huge_scale-free\\huge_sf_sigma_nro_", i, ".csv"), row.names = FALSE)
-      write.csv(sim$omega, paste0(path, "huge_scale-free\\huge_sf_omega_nro_", i, ".csv"), row.names = FALSE)
-      write.csv(as.matrix(sim$theta), paste0(path, "huge_scale-free\\huge_sf_theta_nro_", i, ".csv"), row.names = FALSE)
-      
-      # Datasets with hubs structure from huge.
-      sim <- sim_hubs[[i]]
-      write.csv(sim$data, paste0(path, "hubs\\hubs_data_nro_", i, ".csv"), row.names = FALSE)
-      write.csv(sim$sigma, paste0(path, "hubs\\hubs_sigma_nro_", i, ".csv"), row.names = FALSE)
-      write.csv(sim$omega, paste0(path, "hubs\\hubs_omega_nro_", i, ".csv"), row.names = FALSE)
-      write.csv(as.matrix(sim$theta), paste0(path, "hubs\\hubs_theta_nro_", i, ".csv"), row.names = FALSE)
+      # If save_datasets = TRUE, save they as Rda files and csv files for MATLAB use.
+      if (save_datasets) {
+        cat("Saving datasets...")
+        sim_random <- simulations[[paste0("n", n, "_p", p)]][["random"]]
+        saveRDS(sim_random, file = paste0(path, "/bdgraph_random_n", n, "_p", p, ".Rds"))
+        sim_bdgraph_sf <- simulations[[paste0("n", n, "_p", p)]][["bdgraph_sf"]]
+        saveRDS(sim_bdgraph_sf, file = paste0(path, "/bdgraph_scale-free_n", n, "_p", p, ".Rds"))
+        sim_huge_sf <- simulations[[paste0("n", n, "_p", p)]][["huge_sf"]]
+        saveRDS(sim_huge_sf, file = paste0(path, "/huge_scale-free_n", n, "_p", p, ".Rds"))
+        sim_hubs <- simulations[[paste0("n", n, "_p", p)]][["hubs"]]
+        saveRDS(sim_hubs, file = paste0(path, "/huge_hubs_n", n, "_p", p, ".Rds"))
+        
+        for (i in 1:n_datasets) {
+          sim <- simulations[[paste0("n", n, "_p", p)]][["random"]][[i]]
+          write.csv(sim$data, paste0(path, structure, "/", structure, "_data_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$sigma, paste0(path, structure, "/", structure, "_sigma_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$omega, paste0(path, structure, "/", structure, "_omega_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$theta, paste0(path, structure, "/", structure, "_theta_nro_", i, ".csv"), row.names = FALSE)
+          
+          # Datasets with scale-free structure from BDgraph.
+          sim <-simulations[[paste0("n", n, "_p", p)]][["bdgraph_sf"]][[i]]
+          write.csv(sim$data, paste0(path, structure, "/", structure, "_data_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$sigma, paste0(path, structure, "/", structure, "_sigma_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$omega, paste0(path, structure, "/", structure, "_omega_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$theta, paste0(path, structure, "/", structure, "_theta_nro_", i, ".csv"), row.names = FALSE)
+          
+          # Datasets with scale-free structure from huge.
+          sim <- simulations[[paste0("n", n, "_p", p)]][["huge_sf"]][[i]]
+          write.csv(sim$data, paste0(path, structure, "/", structure, "_data_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$sigma, paste0(path, structure, "/", structure, "_sigma_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$omega, paste0(path, structure, "/", structure, "_omega_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(as.matrix(sim$theta), paste0(path, structure, "/", structure, "_theta_nro_", i, ".csv"), row.names = FALSE)
+          
+          # Datasets with hubs structure from huge.
+          sim <- simulations[[paste0("n", n, "_p", p)]][["hubs"]][[i]]
+          write.csv(sim$data, paste0(path, structure, "/", structure, "_data_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$sigma, paste0(path, structure, "/", structure, "_sigma_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$omega, paste0(path, structure, "/", structure, "_omega_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(as.matrix(sim$theta), paste0(path, structure, "/", structure, "_theta_nro_", i, ".csv"), row.names = FALSE)
+        }
+        cat("done!\n")
+      }
     }
+  }
+  if (return) {
+    return(simulations)
   }
 }
 

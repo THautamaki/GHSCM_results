@@ -1,18 +1,23 @@
 clearvars;
 
-total_sets = 4;
+total_sets = 50;
 
 all_scores = table('Size', [total_sets,20], 'VariableTypes', ["double", "double", "double", "double", "double", "double", "double", ...
       "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"], ...
       'VariableNames', ["ACC", "ACC_bal", "MCC", "F1", "TPR", "TNR", "PPV", ...
       "NPV", "FPR", "FNR", "FDR", "FOR", "LRp", "LRn", "sl_omega", "f_norm", "edge_count", "n", "round", "time"]);
 
-%%
+%% Set what wanted to run
 n = 120;
 %ps = [100, 200];
 ps = 100;
-%structures = ["random", "bdgraph_sf", "huge_sf", "hubs"];
-structures = ["random", "bdgraph_sf"];
+structures = ["random", "bdgraph_sf", "huge_sf", "hubs"];
+%structures = ["random", "bdgraph_sf"];
+
+%% Initialize parallel pool
+parfor i = 1:50
+    1+1;
+end
 
 %%
 total_times = table('Size', [0, 3], 'VariableTypes', ["double", "string", "double"], 'VariableNames', ["p", "structure", "time"]);
@@ -48,7 +53,7 @@ for p = ps
             S = data'*data;
         
             t2 = tic;
-            [GHS_omega, ~] = GHS(S, n, 100, 500, 0);
+            [GHS_omega, ~] = GHS(S, n, 1000, 5000, 0);
             time = toc(t2)
             Omega_mean = mean(GHS_omega, 3);
             
