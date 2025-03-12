@@ -97,7 +97,6 @@ writematrix(a_mat, "..\..\Results_files\DLBC_dataset\DLBC_data_npn_GHSl_ECM_Thet
 
 %% Run GHS LLA (Laplace). Find optimal value for tau.
 desired_tau_ll = CV_HS_LLA_Laplace(data, 1);
-toc(t_cv_start)
 
 %% Run LLA algorithm.
 [Omega_est, total_iterations, each_time_taken] = Multi_start_point_Fixed_tau_HS_LLA_Laplace(data, desired_tau_ll, n_EMs, 1);

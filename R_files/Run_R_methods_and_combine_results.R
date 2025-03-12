@@ -97,3 +97,50 @@ for (n in sample_sizes) {
   }
 }
 
+#######
+# Results of the fastGHS method with p = 100.
+# Initialize paramaters.
+sample_sizes <- c(120)
+variable_numbers <- c(100)
+R_methods <- c("GHSGEM", "fastGHS")
+MATLAB_methods <- c("GHS_MCMC")
+structures <- c("random", "bdgraph_sf", "huge_sf", "hubs")
+
+# Read results from the files.
+fastGHS_results_p100 <- list()
+fastGHS_results_p100 <- add_R_results(fastGHS_results_p100, R_methods, structures, sample_sizes,
+                                      variable_numbers)
+fastGHS_results_p100 <- add_MATLAB_results(fastGHS_results_p100, MATLAB_methods, structures,
+                                           sample_sizes, variable_numbers)
+
+# Set method names.
+random_methods <- c("GHSGEM", "GHSGEM_p/2", "GHS_MCMC", "fastGHS")
+other_methods <- c("GHSGEM", "GHS_MCMC", "fastGHS")
+
+# Set scores.
+scores <- c("MCC", "TPR", "FPR", "FDR", "f_norm_rel", "sl_omega", "time")
+
+# Print results.
+print_results(scores, fastGHS_results_p100, random_methods, "random", 120, 100)
+print_results(scores, fastGHS_results_p100, other_methods, "bdgraph_sf", 120, 100)
+print_results(scores, fastGHS_results_p100, other_methods, "huge_sf", 120, 100)
+print_results(scores, fastGHS_results_p100, other_methods, "hubs", 120, 100)
+
+######
+# Results of the fastGHS method with p = 200 and network structure is random.
+# Read results from the files.
+fastGHS_results_p200 <- list()
+fastGHS_results_p200 <- add_R_results(fastGHS_results_p200, R_methods, "random", 120, 200)
+fastGHS_results_p200 <- add_MATLAB_results(fastGHS_results_p200, MATLAB_methods, "random", 120, 200)
+
+# Print results.
+print_results(scores, fastGHS_results_p200, random_methods, "random", 120, 200)
+
+######
+# Create LaTEX tables.
+create_latex_table(scores, fastGHS_results_p100, random_methods, "random", 120, 100)
+create_latex_table(scores, fastGHS_results_p100, other_methods, "bdgraph_sf", 120, 100)
+create_latex_table(scores, fastGHS_results_p100, other_methods, "huge_sf", 120, 100)
+create_latex_table(scores, fastGHS_results_p100, other_methods, "hubs", 120, 100)
+
+create_latex_table(scores, fastGHS_results_p200, random_methods, "random", 120, 200)
