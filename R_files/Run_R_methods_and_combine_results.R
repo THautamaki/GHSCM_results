@@ -33,8 +33,11 @@ library(pulsar)
 source("R_files/Generate_datasets.R")
 source("R_files/Functions_for_R_methods_and_combining_results.R")
 
-# Generate the datasets if not yet generated.
-generate_datasets()
+# Change this FALSE if data is not yet generated.
+data_generated <- TRUE
+if (!data_generated) {
+  generate_datasets()
+}
 
 # Set all needed parameters.
 sample_sizes <- c(120)
@@ -57,7 +60,6 @@ all_results <- add_MATLAB_results(all_results, MATLAB_methods,
 
 # Define scores which results will be printed.
 scores <- c("MCC", "TPR", "FPR", "FDR", "f_norm_rel", "sl_omega", "time")
-scores <- c("MCC", "TPR", "FPR", "FDR", "sl_omega", "time")
 
 # Define the methods and which order they will be printed. GHS GEM has two results for random network
 # structure.

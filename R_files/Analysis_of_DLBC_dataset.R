@@ -1,14 +1,10 @@
-library(huge)
-library(igraph)
 library(GHSGEM)
 
-source("./network_visualisation_and_scores.R")
+source("R_files/network_visualisation_and_scores.R")
 
 ######
-# Uncomment lines 12 to 37 if the DLBC dataset is not yet created.
-
-# Combine the pathways, create a dataset with unique variables and save it as a csv file.
-# Load rda-file.
+# Combine the pathways, create a dataset with unique variables, transform it using huge.npn and save
+# it as a csv file if data file not yet created.
 if(!file.exists("Data/DLBC_dataset/rppadat_DLBC_npn.csv")) {
   load("Data/DLBC_dataset/rppadat_DLBC.rda")
   
@@ -43,15 +39,15 @@ if(!file.exists("Data/DLBC_dataset/rppadat_DLBC_npn.csv")) {
 data_npn <- as.matrix(read.csv(file = "Data/DLBC_dataset/rppadat_DLBC_npn.csv"))
 
 # Data dimensions
-n <- nrow(rppa_data)
-p <- ncol(rppa_data)
+n <- nrow(data_npn)
+p <- ncol(data_npn)
 
 # Run GHS GEM algorithm
 GHSGEM_MAP <- GHS_MAP_estimation(data_npn, verbose = 1)
 
 ######
 # Read adjacency matrices of other methods
-GHS_MCMC_Theta <- as.matrix(read.csv("Results_files/DLBC_dataset/DLBC_data_npn_GHS_MCMC_Theta_50_CI.txt",
+GHS_MCMC_Theta <- as.matrix(read.csv("Results_files/DLBC_dataset/DLBC_data_npn_GHS_MCMC_Theta.txt",
                                      header = FALSE))
 
 GHS_LLA_Theta <- as.matrix(read.csv("Results_files/DLBC_dataset/DLBC_data_npn_GHS_LLA_Theta.txt",
@@ -66,13 +62,13 @@ colnames(GHSl_ECM_Theta) <- rownames(GHSl_ECM_Theta) <- 1:p
 
 ######
 # Calculate number of connections
-sum(GHSGEM_MAP$Theta) / 2
+sum(GHSGEM_MAP$Theta_est) / 2
 sum(GHS_MCMC_Theta) / 2
 sum(GHS_LLA_Theta) / 2
 sum(GHSl_ECM_Theta) / 2
 
 # Calculate node degrees
-GHS_GEM_degrees <- colSums(GHSGEM_MAP$Theta)
+GHS_GEM_degrees <- colSums(GHSGEM_MAP$Theta_est)
 GHS_MCMC_degrees <- colSums(GHS_MCMC_Theta)
 GHS_LLA_degrees <- colSums(GHS_LLA_Theta)
 GHSl_ECM_degrees <- colSums(GHSl_ECM_Theta)
@@ -83,17 +79,16 @@ sum(GHS_MCMC_degrees > 0)
 sum(GHS_LLA_degrees > 0)
 sum(GHSl_ECM_degrees > 0)
 
-
 ######
 # Calculate coordinates for the nodes
 set.seed(13)
-ceu_coords <- igraph::layout_with_fr(igraph::graph_from_adjacency_matrix(GHSGEM_MAP$Theta,
+ceu_coords <- igraph::layout_with_fr(igraph::graph_from_adjacency_matrix(GHSGEM_MAP$Theta_est,
                                                                          mode = "undirected",
                                                                          diag = FALSE))
 
 # Plot network estimates
 setEPS()
-postscript("/Figures/DLBC_network_estimates.eps", width = 20, height = 5)
+postscript("Figures/Main_article/DLBC_network_estimates.eps", width = 20, height = 5)
 par(mfrow = c(1,4))
 plot_network(GHSGEM_MAP$Theta, layout = ceu_coords, node_size = GHS_GEM_degrees*1.5,
              node_labels = NA, margins = c(0,0,0,0))

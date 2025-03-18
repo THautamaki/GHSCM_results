@@ -77,7 +77,6 @@ sum(GHS_MCMC_degrees > 0)
 sum(GHS_LLA_degrees > 0)
 sum(GHSl_ECM_degrees > 0)
 
-
 ######
 # Calculate coordinates for the nodes
 set.seed(8)
@@ -87,7 +86,7 @@ ceu_coords <- igraph::layout_with_fr(igraph::graph_from_adjacency_matrix(GHSGEM_
 
 # Plot network estimates
 setEPS()
-postscript("Figures/CEU_network_estimates.eps", width = 20, height = 5)
+postscript("Figures/Main_article/CEU_network_estimates.eps", width = 20, height = 5)
 par(mfrow = c(1,4))
 plot_network(GHSGEM_MAP$Theta, layout = ceu_coords, node_size = GHS_GEM_degrees*1.5,
              node_labels = NA, margins = c(0,0,0,0))
