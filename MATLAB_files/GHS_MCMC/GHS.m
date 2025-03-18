@@ -1,5 +1,8 @@
 % Yunfan Li, March 2017
 % Sampling for graphical horseshoe
+% Edits: Tuomas Hautamäki, University of Oulu, 2025:
+%	- Added input "verbose" to print additional information.
+%   - Removed lambda_sq_save output to save memory.
 
 function [omega_save, tau_sq_save] = GHS(S, n, burnin, nmc, verbose)
 	% GHS MCMC sampler using data-augmented block (column-wise) Gibbs sampler.
@@ -8,14 +11,16 @@ function [omega_save, tau_sq_save] = GHS(S, n, burnin, nmc, verbose)
 	%     n         sample size
 	%     burnin    number of MCMC burnins
 	%     nmc       number of MCMC saved samples
+	%     verbose   if 1, print some additional information every 100th iteration.
 
 	% Outputs:
 	%     omega_save      p by p by nmc matrices of saved posterior samples of
 	%                     precision matrix
 	%     lambda_sq_save  p*(p-1)/2 by nmc vector of saved samples of lambda
-	%                     squared (local tuning parameter)
+	%                     squared (local tuning parameter) (removed)
 	%     tau_sq_save     1 by nmc vector of saved samples of tau squared
 	%                     (global tuning parameter)
+
     if verbose == 1
         tic
     end

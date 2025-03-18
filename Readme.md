@@ -7,10 +7,10 @@ expectation-maximization algorithm with graphical horseshoe prior*.
 
 ## Original MATLAB codes
 
-The original MATLAB codes for the GHS Gibbs sampler, GHS local linear
-approximation (GHS LLA), GHS-like expectation conditional maximization
-(ECM), and GHS-like MCMC methods can be found in the following GitHub
-pages:
+The original MATLAB codes for the GHS Gibbs sampler (GHS MCMC), GHS
+local linear approximation (GHS LLA), GHS-like expectation conditional
+maximization (GHS-like ECM or HSL ECM), and GHS-like MCMC (or HSL MCMC)
+methods can be found in the following GitHub pages:
 
 - <https://github.com/liyf1988/GHS>
 - <https://github.com/sagarknk/GHS-LLA-codes>
