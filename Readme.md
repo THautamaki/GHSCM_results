@@ -20,7 +20,7 @@ methods can be found in the following GitHub pages:
   - Codes modified and redistributed with his permission.
 - <https://github.com/sagarknk/Graphical_HSL>
   - Original author: Ksheera Sagar K. N., Purdue University
-  - Codes redistributed with his permission.
+  - Codes modified and redistributed with his permission.
 
 ## Real-world datasets
 
@@ -59,9 +59,9 @@ follows:
 
 ## Performing the simulation analyses
 
-> <font color="red">All provided scripts assume the working directory
-> has the same directory structure as this repository. The scripts use
-> relative paths to read and save files.</font>
+> \[!NOTE\] All provided scripts assume the working directory has the
+> same directory structure as this repository. The scripts use relative
+> paths to read and save files.
 
 To run analyses using the R methods, we created the R script named
 `Run_R_methods_and_combine_results.R`, the main file for the simulation
