@@ -1,16 +1,16 @@
 library(GHSGEM)
 
-structures <- c("random", "bdgraph_sf", "huge_sf", "hubs")
-
-# Analysis for the datasets with 100 variables.
+# Set data dimensions.
 n <- 120
 p <- 100
 
+# Set path (no needed to change).
 path <- paste0("Data/n", n, "_p", p, "/")
 
+# Load datasets.
 sim_bdgraph_sf <- readRDS(file = paste0(path, "bdgraph_scale-free_n", n, "_p", p, ".Rds"))
 
-#######
+# Create plot for normal case example.
 data_nro <- 2
 
 map <- GHS_MAP_estimation(sim_bdgraph_sf[[data_nro]]$data, verbose = 1, max_iterations = 500)
@@ -54,8 +54,7 @@ abline(h = threshold_scores[threshold_scores$thr == 0.5, "FDR"], lty = 2, col = 
 grid()
 dev.off()
 
-
-#######
+# Create plot for worse case example.
 data_nro <- 5
 
 map <- GHS_MAP_estimation(sim_bdgraph_sf[[data_nro]]$data, verbose = 1, max_iterations = 500)
@@ -99,7 +98,7 @@ abline(h = threshold_scores[threshold_scores$thr == 0.5, "FDR"], lty = 2, col = 
 grid()
 dev.off()
 
-#######
+# Create plot for worse case example when tau tuned.
 data_nro <- 5
 
 map <- GHS_MAP_estimation(sim_bdgraph_sf[[data_nro]]$data, verbose = 1, max_iterations = 500,

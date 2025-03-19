@@ -8,7 +8,7 @@ sample_sizes <- c(seq(70, 220, 10), seq(250, 500, 25), seq(550, 800, 50),
                   seq(900, 1500, 100))
 # Set number of variables.
 p <- 150
-# Set number of replications.
+# Set number of datasets.
 n_datasets <- 20
 
 # Run analysis if not yet done.
@@ -25,7 +25,6 @@ if(!file.exists("Results_files/fastGSH_vs_GHSGEM_n70-n1500_p150.Rds")) {
     for (r in 1:n_datasets) {
       n <- sample_sizes[i]
       set.seed(20250312 + n * p + i + r)
-      #sim <- huge.generator(n = n, d = p , graph = "scale-free")
       data <- MASS::mvrnorm(n, mu = rep(0, p), Sigma = sim$sigma)
       # Results using fastGHS.
       result <- fastGHS(data, AIC_selection = FALSE, fix_tau = TRUE, tau_sq = 5, epsilon = 1e-3)

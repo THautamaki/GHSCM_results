@@ -1,22 +1,27 @@
 % Sampling for graphical horseshoe-like
+% Original author: Ksheera Sagar K. N., Purdue University
+% Edits: Tuomas Hautamäki, University of Oulu
+%	- Removed T_sq_vector and tau_sq_save outputs.
+%	- Added input "verbose".
 
-function [omega_save,tau_sq_save] = HSL_MCMC(S,n,burnin,nmc)
+function [omega_save,tau_sq_save] = HSL_MCMC(S,n,burnin,nmc,verbose)
 % GHS-like MCMC sampler using data-augmented
 % block (column-wise) Gibbs sampler
 % Input:
-%     S = Y'*Y : sample covariance matrix * n
-%     n: sample size
-%     burnin, nmc : number of MCMC burnins and saved samples
+%     S = Y'*Y:    sample covariance matrix * n
+%     n:		   sample size
+%     burnin, nmc: number of MCMC burnins and saved samples
+%	  verbose;	   if 1, prints additional information every 100th iteration
 
 % Output:
-%     omega_save: p by p by nmc matrices of saved posterior samples of
-%     precision matrix
-%     omega_vector_save: p*(p-1)/2 by nmc matrices of saved posterior samples of
-%     lower(upper) trinagular entries of the precision matrix
-%     T_sq_save: p*(p-1)/2 by nmc vector of saved samples of t_{ij}
-%     squared (local tuning parameter)
+%     omega_save:  p by p by nmc matrices of saved posterior samples of
+%                  precision matrix
+%     omega_vector_save: Removed! p*(p-1)/2 by nmc matrices of saved posterior samples of
+%                        lower(upper) trinagular entries of the precision matrix
+%     T_sq_save:   Removed! p*(p-1)/2 by nmc vector of saved samples of t_{ij}
+%                  squared (local tuning parameter)
 %     tau_sq_save: 1 by nmc vector of saved samples of tau squared (global
-%     tuning parameter)
+%                  tuning parameter)
 
 [p] = size(S,1); indmx = reshape([1:p^2],p,p); 
 upperind = indmx(triu(indmx,1)>0); 
@@ -47,12 +52,13 @@ Omega = eye(p); Sigma = eye(p);
 T(1:p,1:p) = 1; M(1:p,1:p) = 1; tau_sq = 1; xi = 1;
 
 %tic;
-for iter = 1: burnin+nmc    
-          
-    %if(mod(iter,100)==0)
-    % fprintf('iter = %d \n',iter);
-    %end
-       
+for iter = 1: burnin+nmc
+	if(verbose > 0)
+		if(mod(iter,100)==0)
+			fprintf('iter = %d \n',iter);
+		end
+	end
+	
 %%% sample Sigma and Omega=inv(Sigma)
     for i = 1:p
       ind_noi = ind_noi_all(:,i);     

@@ -1,9 +1,10 @@
 
 # Results of the article: Gene co-expression network estimation using GEM with GHS prior
 
-This repository contains all codes used to produce the results for the
-article *Gene co-expression network estimation using generalized
-expectation-maximization algorithm with graphical horseshoe prior*.
+This repository contains all codes and results files used to produce the
+results for the article *Gene co-expression network estimation using
+generalized expectation-maximization algorithm with graphical horseshoe
+prior*.
 
 ## Original MATLAB codes
 
@@ -13,8 +14,13 @@ maximization (GHS-like ECM or HSL ECM), and GHS-like MCMC (or HSL MCMC)
 methods can be found in the following GitHub pages:
 
 - <https://github.com/liyf1988/GHS>
+  - Original author: Yunfan Li
 - <https://github.com/sagarknk/GHS-LLA-codes>
+  - Original author: Ksheera Sagar K. N., Purdue University
+  - Codes modified and redistributed with his permission.
 - <https://github.com/sagarknk/Graphical_HSL>
+  - Original author: Ksheera Sagar K. N., Purdue University
+  - Codes redistributed with his permission.
 
 ## Real-world datasets
 

@@ -1,6 +1,7 @@
 library(GHSGEM)
 
-source("R_files/network_visualisation_and_scores.R")
+# Load functions for plotting networks.
+source("R_files/network_visualization.R")
 
 ######
 # Combine the pathways, create a dataset with unique variables, transform it using huge.npn and save

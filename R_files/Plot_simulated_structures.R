@@ -1,40 +1,20 @@
-library(igraph)
+# Load functions for plotting networks.
+source("R_files/network_visualization.R")
 
-plot_network <- function(a_mat, title = "", vertex_size = 3, margins = c(5.1, 4.1, 4.1, 2.1),
-                         delete_isolates = FALSE, delete_nodes_degree = 0,
-                         node_label_dist = 0.8, node_labels = NULL) {
-  par(mar = margins)
-  network <- graph_from_adjacency_matrix(a_mat, mode = "undirected", diag = F)
-  if (delete_isolates) {
-    network <- delete_vertices(network, V(network)[degree(network) == 0])
-  }
-  if (delete_nodes_degree > 0) {
-    network <- delete_vertices(network, V(network)[degree(network) <= delete_nodes_degree])
-  }
-  coords <- layout_with_fr(network)
-  if (is.null(node_labels)) {
-    plot(network, layout = coords, vertex.label.color = "black", edge.width = 3,
-         vertex.label.dist = node_label_dist, vertex.size = vertex_size)
-  }
-  else {
-    plot(network, layout = coords, vertex.label.color = "black", edge.width = 3,
-         vertex.label.dist = node_label_dist, vertex.size = vertex_size,
-         vertex.label = node_labels)
-  }
-  title(main = title)
-}
-
+# Set parameter.
 n <- 120
 p <- 100
 
+# Set path (no needed to change).
 path <- paste0("Data/n", n, "_p", p, "/")
 
+# Load datasets.
 sim_random <- readRDS(file = paste0(path, "bdgraph_random_n", n, "_p", p, ".Rds"))
 sim_bdgraph_sf <- readRDS(file = paste0(path, "bdgraph_scale-free_n", n, "_p", p, ".Rds"))
 sim_huge_sf <- readRDS(file = paste0(path, "huge_scale-free_n", n, "_p", p, ".Rds"))
 sim_hubs <- readRDS(file = paste0(path, "huge_hubs_n", n, "_p", p, ".Rds"))
 
-
+# Plot simulated network structures and save as eps-file.
 setEPS()
 postscript("Figures/Main_article/Simulated_structures.eps", width = 20, height = 5)
 

@@ -2,7 +2,7 @@
 % Sampling for graphical horseshoe
 % Edits: Tuomas Hautamäki, University of Oulu, 2025:
 %	- Added input "verbose" to print additional information.
-%   - Removed lambda_sq_save output to save memory.
+%	- Removed lambda_sq_save output to save memory.
 
 function [omega_save, tau_sq_save] = GHS(S, n, burnin, nmc, verbose)
 	% GHS MCMC sampler using data-augmented block (column-wise) Gibbs sampler.

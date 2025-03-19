@@ -1,3 +1,4 @@
+# Install all required packages.
 if(!require("BDgraph", quietly = TRUE)) {
   install.packages("BDgraph")
 }
@@ -23,6 +24,7 @@ if(!require("igraph", quietly = TRUE)) {
   install.packages("igraph")
 }
 
+# Load packages.
 library(GHSGEM)
 library(beam)
 library(huge)
@@ -30,6 +32,7 @@ library(fastGHS)
 library(doParallel)
 library(pulsar)
 
+# Load functions needed for the analyses.
 source("R_files/Generate_datasets.R")
 source("R_files/Functions_for_R_methods_and_combining_results.R")
 

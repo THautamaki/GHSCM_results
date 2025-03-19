@@ -1,3 +1,8 @@
+% Original author: Ksheera Sagar K. N., Purdue University
+% Edits: Tuomas Hautamäki, University of Oulu
+%	- Added input "b_init", which can be calculated using the R script scale_factor_computation.R
+%	  from Sagar's GitHub page https://github.com/sagarknk/Graphical_HSL.
+
 function [Omega_est, final_nu_matrix, total_iterations, each_time_taken]  = ...
     Multi_start_point_Fixed_b_EM_HS_like(Omega_saves, S, n, q, b_init, n_EMs)
 

@@ -34,7 +34,7 @@ run_analysis <- function(structure, n, p, method = "GHSGEM", p0 = 0, save_result
     packages <- c("fastGHS", "GHSGEM")
   }
   else {
-    stop("Wrong method! Possible choices are 'GHSGEM', 'GLASSO', 'pulsar' and 'fastGHS'.")
+    stop("Wrong method! Possible choices are 'GHSGEM', 'GLASSO', 'pulsar', 'beam', and 'fastGHS'.")
   }
   cl <- makeCluster(cores)
   registerDoParallel(cl)

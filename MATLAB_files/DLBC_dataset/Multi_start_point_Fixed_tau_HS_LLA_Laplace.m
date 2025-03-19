@@ -1,3 +1,11 @@
+% Original author: Ksheera Sagar K. N., Purdue University
+% Edits: Tuomas Hautamäki, University of Oulu
+%	- Changed function input that it can take any dataset.
+%	- Added input "tau_val", which could be calculated using function CV_HS_LLA_Cauchy().
+%	- Changed to use parfor-loop instead of normal sequential for-loop.
+%	- Added input "verbose", which can be 0, 1 or 2 adding more information to print
+%	  when it increases. Zero means no printing.
+
 function [Omega_est, total_iterations, each_time_taken] = Multi_start_point_Fixed_tau_HS_LLA_Laplace(data, tau_val, n_EMs, verbose)
     n = size(data, 1);
     q = size(data, 2);

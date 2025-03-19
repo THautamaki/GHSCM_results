@@ -1,6 +1,7 @@
 library(GHSGEM)
 
-source("R_files/network_visualisation_and_scores.R")
+# Load functions for plotting networks.
+source("R_files/network_visualization.R")
 
 # Create dataset with 100 variables and save it as csv file.
 # Read normalized dataset from the csv-file.

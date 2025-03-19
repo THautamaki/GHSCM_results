@@ -1,3 +1,10 @@
+% Original author: Ksheera Sagar K. N., Purdue University
+% Edits: Tuomas Hautamäki, University of Oulu
+%	- Changed function input that it can take any dataset.
+%	- Changed to use parfor-loop instead of normal sequential for-loop.
+%	- Added input "verbose", which can be 0, 1 or 2 adding more information to print
+%	  when it increases. Zero means no printing.
+
 function desired_tau = CV_HS_LLA_Laplace(data, verbose)
     n = size(data, 1);
     q = size(data, 2);
@@ -55,7 +62,7 @@ function desired_tau = CV_HS_LLA_Laplace(data, verbose)
     time_taken_taus = zeros(1, length(tau_seq));
     all_pred_MSEs = zeros(1, length(tau_seq));
     n_folds = 5;
-    CV_folds = repmat(1:n_folds, 1,floor(n/n_folds));
+    CV_folds = repmat(1:n_folds, 1,n/n_folds);
 
     parfor tau_idx = 1:length(tau_seq)
 
