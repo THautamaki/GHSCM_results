@@ -59,7 +59,8 @@ follows:
 
 ## Performing the simulation analyses
 
-> \[!NOTE\] All provided scripts assume the working directory has the
+> [!NOTE\
+> All provided scripts assume the working directory has the
 > same directory structure as this repository. The scripts use relative
 > paths to read and save files.
 
