@@ -48,7 +48,8 @@ The files in the repository are organized in the main directories as follows:
 
 ## Performing the simulation analyses
 
-> [!NOTE] All provided scripts assume the working directory has the same directory structure as this repository. The scripts use relative paths to read and save files.
+> [!NOTE]
+> All provided scripts assume the working directory has the same directory structure as this repository. The scripts use relative paths to read and save files.
 
 To run analyses using the R methods, we created the R script named `Run_R_methods_and_combine_results.R`, the main file for the simulation analysis. It is well commented on, so we do not give details here. It installs all needed R packages, creates simulated datasets, runs R methods, combines all results files, and finally prints results.
 
