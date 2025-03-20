@@ -14,19 +14,19 @@ maximization (GHS-like ECM or HSL ECM), and GHS-like MCMC (or HSL MCMC)
 methods can be found on the following GitHub pages:
 
 - <https://github.com/liyf1988/GHS>
-  - Original author: Yunfan Li
+  - Author: Yunfan Li
 - <https://github.com/sagarknk/GHS-LLA-codes>
-  - Original author: Ksheera Sagar K. N., Purdue University
-  - Codes modified and redistributed with his permission.
+  - Author: Ksheera Sagar K. N., Purdue University
+  - Codes were modified and redistributed with his permission.
 - <https://github.com/sagarknk/Graphical_HSL>
-  - Original author: Ksheera Sagar K. N., Purdue University
-  - Codes modified and redistributed with his permission.
+  - Author: Ksheera Sagar K. N., Purdue University
+  - Codes were modified and redistributed with his permission.
 
 ## Real-world datasets
 
-The CEU dataset is available on Sanger Institute’s website
-<https://ftp.sanger.ac.uk/pub/genevar> and the DLBC dataset is available
-on the website of the PRECISE framework
+The CEU dataset is available on Sanger Institute’s website:
+<https://ftp.sanger.ac.uk/pub/genevar>, and the DLBC dataset is
+available on the website of the PRECISE framework:
 <https://mjha.shinyapps.io/PRECISE>.
 
 ## Structure of the repository
@@ -35,11 +35,11 @@ The files in the repository are organized in the main directories as
 follows:
 
 - Data
-  - This directory is not stored in GitHub as the simulated datasets
-    can be generated anytime, and real-world datasets are available
-    publicly on the internet. The R code creates this when simulated
-    datasets are generated. Please store the real-world datasets in the
-    directories named “CEU_dataset” and “DLBC_dataset”.
+  - This directory is not stored in GitHub as simulated datasets can be
+    generated anytime, and real-world datasets are available publicly on
+    the Internet. The R code creates this when simulated datasets are
+    generated. Please store the real-world datasets in the directories
+    named `CEU_dataset` and `DLBC_dataset`.
 - Figures
   - Contains all figures generated for the main article and
     supplementary material in own directories.
@@ -53,14 +53,14 @@ follows:
 - Results_files
   - The root contains the total times of the MATLAB methods.
   - The simulations with both problem dimensions $p = \{100, 200\}$ have
-    own directories, where results are stored per method per directory.
-  - Both real-world datasets have their directories containing all results
-    files.
+    their directories, where results are stored per method per
+    directory.
+  - Both real-world datasets have their directories containing all
+    results files.
 
 ## Performing the simulation analyses
 
-> [!NOTE]
-> All provided scripts assume the working directory has the
+> [!NOTE] All provided scripts assume the working directory has the
 > same directory structure as this repository. The scripts use relative
 > paths to read and save files.
 
@@ -68,7 +68,7 @@ To run analyses using the R methods, we created the R script named
 `Run_R_methods_and_combine_results.R`, the main file for the simulation
 analysis. It is well commented on, so we do not give details here. It
 installs all needed R packages, creates simulated datasets, runs R
-methods combines all results files and finally prints results.
+methods, combines all results files, and finally prints results.
 
 The simulated datasets used in the article can always be created using
 the function `generate_datasets()` with no arguments (the default
@@ -76,11 +76,11 @@ arguments).
 
 Each MATLAB method has `<method_name>_analysis.m` file to run
 simulations. They are all well commented and can be run using MATLAB’s
-`Run all sections` shortcut. Please note that the helper functions
-should be placed into the `%userprofile%\Documents\MATLAB` folder (if a
-Windows machine) so that MATLAB can find these.
+`Run all sections` shortcut. Note that the helper functions should be
+placed into the `%userprofile%\Documents\MATLAB` folder (if a Windows
+machine) so that MATLAB can find these.
 
-Please note that if a similar system is used, as in the article, all
+Note that if a similar system is used, as in the article, all
 simulations take about 3.5 days to run.
 
 ## Performing the real-world dataset analyses
@@ -92,8 +92,8 @@ We suggest creating transformed datasets first by running lines 7–32
 from the R script `Analysis_of_CEU_dataset.R`. Then MATLAB methods can
 be run from the script `Run_CEU_dataset_MATLAB_methods.m` MATLAB’s
 `Run all sections` shortcut. Finally, the rest of the lines from the R
-script can be run. It performs the GHS GEM method, calculates numbers
-used in the article, and plots the estimated networks.
+script can be run. It performs the GHS GEM method, calculates the
+numbers used in the article, and plots the estimated networks.
 
 ### The DLBC dataset
 
@@ -125,7 +125,7 @@ The R script `Analysis_of_c_parameter.R`.
 ### Results with the fastGHS method
 
 We did not include the fastGHS method results in the main article, but
-they can be reproduced using the same R script as used for the main
-results (`Run_R_methods_and_combine_results.R`, lines from 102 forward).
-We also did some additional analysis, which can be reproduced using the
-R script `Additional_fastGHS_analysis.R`.
+they can be reproduced using the same R script used for the main results
+(`Run_R_methods_and_combine_results.R`, lines from 102 forward). We also
+did some additional analysis, which can be reproduced using the R script
+`Additional_fastGHS_analysis.R`.
