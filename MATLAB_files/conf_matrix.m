@@ -1,4 +1,16 @@
+% Author: Tuomas Hautamäki, University of Oulu
 function cm = conf_matrix(truth, estimation)
+  % Construct confusion matrix using the true adjacency and estimated adjacency matrices of
+  % the network. Can be used both directed and undirected networks.
+  %
+  % Inputs
+  %   truth       The true p by p adjacency matrix of the network.
+  %   estimation  The estimated \code{p} by \code{p} adjacency matrix of the network.
+  % 
+  % Outputs
+  %   cm          A 2 by 2 table, where the first element is number of the true positives (TP),
+  %               second element is number of the false negatives (FN), third element is number of
+  %               the falste positives (FP) and last element is number of the true negatives (TN).
   same_edges = truth .* estimation;
   diff = truth - estimation;
   summ = truth + estimation;

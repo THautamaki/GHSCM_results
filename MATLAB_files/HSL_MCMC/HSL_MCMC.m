@@ -1,5 +1,5 @@
 % Sampling for graphical horseshoe-like
-% Original author: Ksheera Sagar K. N., Purdue University
+% Author: Ksheera Sagar K. N., Purdue University
 % Edits: Tuomas Hautamäki, University of Oulu
 %	- Removed T_sq_vector and tau_sq_save outputs.
 %	- Added input "verbose".

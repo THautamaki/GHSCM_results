@@ -1,4 +1,4 @@
-% Original author: Ksheera Sagar K. N., Purdue University
+% Author: Ksheera Sagar K. N., Purdue University
 % Edits: Tuomas Hautamäki, University of Oulu
 %	- Added input "b_init", which can be calculated using the R script scale_factor_computation.R
 %	  from Sagar's GitHub page https://github.com/sagarknk/Graphical_HSL.

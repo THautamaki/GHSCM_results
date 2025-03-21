@@ -1,4 +1,4 @@
-% Original author: Ksheera Sagar K. N., Purdue University
+% Author: Ksheera Sagar K. N., Purdue University
 % Edits: Tuomas Hautamäki, University of Oulu
 %	- Changed function input that it can take any dataset.
 %	- Changed to use parfor-loop instead of normal sequential for-loop.

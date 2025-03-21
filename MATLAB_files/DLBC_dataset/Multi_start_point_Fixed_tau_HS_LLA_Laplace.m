@@ -1,4 +1,4 @@
-% Original author: Ksheera Sagar K. N., Purdue University
+% Author: Ksheera Sagar K. N., Purdue University
 % Edits: Tuomas Hautamäki, University of Oulu
 %	- Changed function input that it can take any dataset.
 %	- Added input "tau_val", which could be calculated using function CV_HS_LLA_Cauchy().
