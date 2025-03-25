@@ -24,10 +24,6 @@ if(!file.exists("Data/DLBC_dataset/rppadat_DLBC_npn.csv")) {
   # Select variables and convert data to a matrix.
   rppa_data <- as.matrix(rppa_data[, var_names])
   
-  # Data dimensions
-  n <- nrow(rppa_data)
-  p <- ncol(rppa_data)
-  
   # Transform data using huge.npn().
   data_npn <- huge::huge.npn(rppa_data)
   
@@ -80,30 +76,6 @@ sum(GHS_MCMC_degrees > 0)
 sum(GHS_LLA_degrees > 0)
 sum(GHSl_ECM_degrees > 0)
 
-######
-# Calculate coordinates for the nodes
-set.seed(13)
-ceu_coords <- igraph::layout_with_fr(igraph::graph_from_adjacency_matrix(GHSGEM_MAP$Theta_est,
-                                                                         mode = "undirected",
-                                                                         diag = FALSE))
-
-# Plot network estimates
-setEPS()
-postscript("Figures/Main_article/DLBC_network_estimates.eps", width = 20, height = 5)
-par(mfrow = c(1,4))
-plot_network(GHSGEM_MAP$Theta, layout = ceu_coords, node_size = GHS_GEM_degrees*1.5,
-             node_labels = NA, margins = c(0,0,0,0))
-
-plot_network(GHS_MCMC_Theta, layout = ceu_coords, node_size = GHS_MCMC_degrees*1.5,
-             node_labels = NA, margins = c(0,0,0,0))
-
-plot_network(GHS_LLA_Theta, layout = ceu_coords, node_size = GHS_LLA_degrees/1.5, node_labels = NA,
-             margins = c(0,0,0,0))
-
-plot_network(GHSl_ECM_Theta, layout = ceu_coords, node_size = GHSl_ECM_degrees/1.5, node_labels = NA,
-             margins = c(0,0,0,0))
-dev.off()
-
 # Confusion matrix between GHS GEM and GHS MCMC estimates
 conf_matrix(GHSGEM_MAP$Theta, GHS_MCMC_Theta)
 
@@ -127,3 +99,26 @@ GHS_MCMC_degrees[order(GHS_MCMC_degrees, decreasing = TRUE)][1:10]
 GHS_LLA_degrees[order(GHS_LLA_degrees, decreasing = TRUE)][1:10]
 GHSl_ECM_degrees[order(GHSl_ECM_degrees, decreasing = TRUE)][1:10]
 
+######
+# Calculate coordinates for the nodes
+set.seed(13)
+ceu_coords <- igraph::layout_with_fr(igraph::graph_from_adjacency_matrix(GHSGEM_MAP$Theta_est,
+                                                                         mode = "undirected",
+                                                                         diag = FALSE))
+
+# Plot network estimates
+setEPS()
+postscript("Figures/Main_article/DLBC_network_estimates.eps", width = 20, height = 5)
+par(mfrow = c(1,4))
+plot_network(GHSGEM_MAP$Theta, layout = ceu_coords, node_size = GHS_GEM_degrees*1.5,
+             node_labels = NA, margins = c(0,0,0,0))
+
+plot_network(GHS_MCMC_Theta, layout = ceu_coords, node_size = GHS_MCMC_degrees*1.5,
+             node_labels = NA, margins = c(0,0,0,0))
+
+plot_network(GHS_LLA_Theta, layout = ceu_coords, node_size = GHS_LLA_degrees/1.5, node_labels = NA,
+             margins = c(0,0,0,0))
+
+plot_network(GHSl_ECM_Theta, layout = ceu_coords, node_size = GHSl_ECM_degrees/1.5, node_labels = NA,
+             margins = c(0,0,0,0))
+dev.off()

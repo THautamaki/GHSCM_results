@@ -78,6 +78,29 @@ sum(GHS_MCMC_degrees > 0)
 sum(GHS_LLA_degrees > 0)
 sum(GHSl_ECM_degrees > 0)
 
+# Confusion matrix between GHS GEM and GHS MCMC estimates
+conf_matrix(GHSGEM_MAP$Theta, GHS_MCMC_Theta)
+
+# Set names for the nodes.
+names(GHS_GEM_degrees) <- names(GHS_MCMC_degrees) <- 1:p
+
+# Calculate how many nodes with the highest degree are the same
+same_nodes <- c()
+for (n1 in names(GHS_GEM_degrees[order(GHS_GEM_degrees, decreasing = TRUE)][1:10])) {
+  for (n2 in names(GHS_MCMC_degrees[order(GHS_MCMC_degrees, decreasing = TRUE)][1:10])) {
+    if (n1 == n2) {
+      same_nodes <- c(same_nodes, n1)
+    }
+  }
+}
+same_nodes
+
+# Highest degrees
+GHS_GEM_degrees[order(GHS_GEM_degrees, decreasing = TRUE)][1:10]
+GHS_MCMC_degrees[order(GHS_MCMC_degrees, decreasing = TRUE)][1:10]
+GHS_LLA_degrees[order(GHS_LLA_degrees, decreasing = TRUE)][1:10]
+GHSl_ECM_degrees[order(GHSl_ECM_degrees, decreasing = TRUE)][1:10]
+
 ######
 # Calculate coordinates for the nodes
 set.seed(8)
@@ -101,26 +124,3 @@ plot_network(GHS_LLA_Theta, layout = ceu_coords, node_size = GHS_LLA_degrees/1.5
 plot_network(GHSl_ECM_Theta, layout = ceu_coords, node_size = GHSl_ECM_degrees/1.5, node_labels = NA,
              margins = c(0,0,0,0))
 dev.off()
-
-# Confusion matrix between GHS GEM and GHS MCMC estimates
-conf_matrix(GHSGEM_MAP$Theta, GHS_MCMC_Theta)
-
-# Set names for the nodes.
-names(GHS_GEM_degrees) <- names(GHS_MCMC_degrees) <- 1:p
-
-# Calculate how many nodes with the highest degree are the same
-same_nodes <- c()
-for (n1 in names(GHS_GEM_degrees[order(GHS_GEM_degrees, decreasing = TRUE)][1:10])) {
-  for (n2 in names(GHS_MCMC_degrees[order(GHS_MCMC_degrees, decreasing = TRUE)][1:10])) {
-    if (n1 == n2) {
-      same_nodes <- c(same_nodes, n1)
-    }
-  }
-}
-same_nodes
-
-# Highest degrees
-GHS_GEM_degrees[order(GHS_GEM_degrees, decreasing = TRUE)][1:10]
-GHS_MCMC_degrees[order(GHS_MCMC_degrees, decreasing = TRUE)][1:10]
-GHS_LLA_degrees[order(GHS_LLA_degrees, decreasing = TRUE)][1:10]
-GHSl_ECM_degrees[order(GHSl_ECM_degrees, decreasing = TRUE)][1:10]

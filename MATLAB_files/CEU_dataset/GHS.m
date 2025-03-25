@@ -20,7 +20,6 @@ function [omega_save, tau_sq_save] = GHS(S, n, burnin, nmc, verbose)
 	%                     squared (local tuning parameter) (removed)
 	%     tau_sq_save     1 by nmc vector of saved samples of tau squared
 	%                     (global tuning parameter)
-
     if verbose == 1
         tic
     end

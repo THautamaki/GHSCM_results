@@ -9,7 +9,7 @@
 function [Omega_est, total_iterations, each_time_taken] = Multi_start_point_Fixed_tau_HS_LLA_Laplace(data, tau_val, n_EMs, verbose)
     n = size(data, 1);
     q = size(data, 2);
-    rng(123456789);
+    rng(123456789); % As parfor used, this does not do anything.
     %%%%%%%%%%%
     matObj = matfile("HS_LLA_LAPLACE_mix.mat");
     dawson_vals = matObj.dawson_vals;

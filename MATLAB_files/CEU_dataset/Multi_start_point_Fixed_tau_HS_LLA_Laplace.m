@@ -1,15 +1,15 @@
 % Author: Ksheera Sagar K. N., Purdue University
 % Edits: Tuomas Hautamäki, University of Oulu
 %	- Changed function input that it can take any dataset.
-%	- Added input "tau_val", which could be calculated using function CV_HS_LLA_Cauchy().
+%	- Added input "tau_val", which could be calculated using function CV_HS_LLA_Laplace().
 %	- Changed to use parfor-loop instead of normal sequential for-loop.
+%   - Added input "seed" for user controllable reproducible results.
 %	- Added input "verbose", which can be 0, 1 or 2 adding more information to print
 %	  when it increases. Zero means no printing.
 
-function [Omega_est, total_iterations, each_time_taken] = Multi_start_point_Fixed_tau_HS_LLA_Laplace(data, tau_val, n_EMs, verbose)
+function [Omega_est, total_iterations, each_time_taken] = Multi_start_point_Fixed_tau_HS_LLA_Laplace(data, tau_val, n_EMs, seed, verbose)
     n = size(data, 1);
     q = size(data, 2);
-    rng(123456789);
     %%%%%%%%%%%
     matObj = matfile("HS_LLA_LAPLACE_mix.mat");
     dawson_vals = matObj.dawson_vals;
@@ -41,28 +41,22 @@ function [Omega_est, total_iterations, each_time_taken] = Multi_start_point_Fixe
 
     %%%%%%%%%
     Omega_saves = zeros(q,q,n_EMs);
-    parfor i = 1:n_EMs
-
+    rng(seed);
+    for i = 1:n_EMs
         start_point = eye(q);
-
         for row = 2:q
             d = 0;
             while d~=q
                 row_seq = row:1:q;
                 col_seq = 1:1:(q-row+1);
-
                 rand_noise = -0.05 + rand(1, length(row_seq))*2*0.05;
                 %rand_noise = -0.1 + rand(1, length(row_seq))*2*0.1;
-
                 lin_idcs = sub2ind(size(start_point), row_seq, col_seq);
                 start_point(lin_idcs) = rand_noise;
-
                 lin_idcs = sub2ind(size(start_point), col_seq, row_seq);
                 start_point(lin_idcs) = rand_noise;
-
                 d = eig(start_point);
                 d = sum(d>0);
-
             end
         end
         if verbose > 0

@@ -1,5 +1,6 @@
 %% Read dataset.
 clearvars;
+rng("default") % Reset random number generator to default session setting.
 
 datafile = ['..\..\Data\DLBC_dataset\rppadat_DLBC_npn.csv'];
 
@@ -12,9 +13,6 @@ S = data'*data;
 
 %% Run MCMC algorithm.
 [GHS_omega, ~] = GHS(S, n, 1000, 5000, 1);
-
-%% Calculate mean of the precision matrix.
-Omega_mean = mean(GHS_omega, 3);
 
 %% Construct adjacency matrix using 50 percent credible intervals.
 quant = 0.25;
@@ -43,10 +41,10 @@ writematrix(a_mat, "..\..\Results_files\DLBC_dataset\DLBC_data_npn_GHS_MCMC_Thet
 n_EMs = 50;
 b_init = 0.02856817;
 Omega_saves = zeros(p,p,n_EMs);
-rng(123456789);
 
 %% Generate initial values.
-parfor i = 1:n_EMs %choose parfor instead of "for" loop if running on a multi core CPU
+rng(20250326);
+for i = 1:n_EMs % Do not use parfor here if results need to be reproducible.
     start_point = eye(p);
     for row = 2:p
         d = 0;
@@ -71,8 +69,7 @@ parfor i = 1:n_EMs %choose parfor instead of "for" loop if running on a multi co
 end
 
 %% Run ECM algorithm.
-[Omega_est, final_nu_matrix, total_iterations, each_time_taken] =...
-    Multi_start_point_Fixed_b_EM_HS_like(Omega_saves, S, n1, q1, b_init, n_EMs);
+[Omega_est, ~] = Multi_start_point_Fixed_b_EM_HS_like(Omega_saves, S, n1, q1, b_init, n_EMs);
 
 %% Calculate mean of the precision matrix.
 Omega_mean = mean(Omega_est, 3);
@@ -99,13 +96,13 @@ writematrix(a_mat, "..\..\Results_files\DLBC_dataset\DLBC_data_npn_GHSl_ECM_Thet
 desired_tau_ll = CV_HS_LLA_Laplace(data, 1);
 
 %% Run LLA algorithm.
-[Omega_est, total_iterations, each_time_taken] = Multi_start_point_Fixed_tau_HS_LLA_Laplace(data, desired_tau_ll, n_EMs, 1);
+[Omega_est, ~] = Multi_start_point_Fixed_tau_HS_LLA_Laplace(data, desired_tau_ll, n_EMs, 20250327, 1);
 
 %% Calculate mean of the precision matrix.
 Omega_mean = mean(Omega_est, 3);
 
 %% Construct adjacency matrix.
-a_mat_ll = zeros(p);
+a_mat = zeros(p);
 for i = 1:p
     for j = i:p
         if i == j
@@ -120,4 +117,5 @@ for i = 1:p
 end
 
 %% Write the adjacency matrix into text file.
-writematrix(a_mat_ll, "..\..\Results_files\DLBC_dataset\DLBC_data_npn_GHS_LLA_Theta.txt")
+writematrix(a_mat, "..\..\Results_files\DLBC_dataset\DLBC_data_npn_GHS_LLA_Theta.txt")
+

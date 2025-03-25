@@ -50,7 +50,6 @@ for p = ps
                     d = sum(d>0);
                 end
         end
-        % fprintf("Finished %d th start point generation out of %d start points \n", i, n_EMs);
         Omega_saves(:,:,i) = start_point;
     end
     if(p == 100 && n == 120)
