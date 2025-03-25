@@ -72,14 +72,17 @@ installs all needed R packages, creates simulated datasets, runs R
 methods, combines all results files, and finally prints results.
 
 The simulated datasets used in the article can always be created using
-the function `generate_datasets()` with no arguments (the default
+the function `generate_datasets()` without arguments (the default
 arguments).
 
 Each MATLAB method has `<method_name>_analysis.m` file to run
 simulations. They are all well commented and can be run using MATLAB’s
 `Run all sections` shortcut. Note that the helper functions should be
 placed into the `%userprofile%\Documents\MATLAB` folder (if a Windows
-machine) so that MATLAB can find these.
+machine) so that MATLAB can find these. The simulation results have
+run-to-run variance as we do not use fixed seeds for every MATLAB method
+(and StARS for GLASSO). The biggest difference in MCC we saw was about
+0.012.
 
 Note that if a similar system is used, as in the article, all
 simulations take about 3.5 days to run.
@@ -91,7 +94,7 @@ simulations take about 3.5 days to run.
 We created R and MATLAB scripts to perform analyses of the CEU dataset.
 We suggest creating transformed datasets first by running lines 7–32
 from the R script `Analysis_of_CEU_dataset.R`. Then MATLAB methods can
-be run from the script `Run_CEU_dataset_MATLAB_methods.m` MATLAB’s
+be run from the script `Run_CEU_dataset_MATLAB_methods.m` using MATLAB’s
 `Run all sections` shortcut. Finally, the rest of the lines from the R
 script can be run. It performs the GHS GEM method, calculates the
 numbers used in the article, and plots the estimated networks.
@@ -99,12 +102,12 @@ numbers used in the article, and plots the estimated networks.
 ### The DLBC dataset
 
 We created R and MATLAB scripts to perform analyses of the DLBC dataset.
-We suggest creating transformed datasets first by running lines 8–35
+We suggest creating transformed datasets first by running lines 8–32
 from the R script `Analysis_of_DLBC_dataset.R`. Then MATLAB methods can
-be run from the script `Run_DLBC_dataset_MATLAB_methods.m` MATLAB’s
-`Run all sections` shortcut. Finally, the rest of the lines from the R
-script can be run. It performs the GHS GEM method, calculates the
-numbers used in the article, and plots the estimated networks.
+be run from the script `Run_DLBC_dataset_MATLAB_methods.m` using
+MATLAB’s `Run all sections` shortcut. Finally, the rest of the lines
+from the R script can be run. It performs the GHS GEM method, calculates
+the numbers used in the article, and plots the estimated networks.
 
 ## Supplementary materials
 
