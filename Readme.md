@@ -6,6 +6,9 @@ results for the article *Gene co-expression network estimation using
 generalized expectation-maximization algorithm with graphical horseshoe
 prior*.
 
+We implemented our method in the R package called GHSGEM, which is
+available on GitHub at <https://github.com/THautamaki/GHSGEM>.
+
 ## Original MATLAB codes
 
 The original MATLAB codes of the GHS Gibbs sampler (GHS MCMC), GHS local
@@ -65,16 +68,17 @@ follows:
 > same directory structure as this repository. The scripts use relative
 > paths to read and save files.
 
+The simulated datasets used in the article can always be created using
+the function `generate_datasets()` without arguments (the default
+arguments). It saves datasets in the `Data` directory in Rds and
+csv-format for R and MATLAB use, respectively.
+
 To run analyses using R methods, we created an R script named
-Run_R_methods_and_combine_results.R serves as the main file for the
-simulation analysis. It has been well commented on, so we will not
+`Run_R_methods_and_combine_results.R` which serves as the main file for
+the simulation analysis. It has been well commented on, so we will not
 provide details here. It installs all necessary R packages, creates
 simulated datasets, runs R methods, combines all result files, and
 finally prints the results.
-
-The simulated datasets used in the article can always be created using
-the function `generate_datasets()` without arguments (the default
-arguments).
 
 Each MATLAB method has `<method_name>_analysis.m` file to run
 simulations. They are all well-commented and can be run using MATLAB’s

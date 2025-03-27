@@ -94,11 +94,6 @@ if(!file.exists("Results_files/Parameter_c/Results_with_fdr_control.Rds")) {
   saveRDS(results_with_fdr_control, "Results_files/Parameter_c/Results_with_fdr_control.Rds")
 }
 
-# Load results if saved earlier.
-if (file.exists("Results_files/Parameter_c/Results_with_fdr_control.Rds")) {
-  results_with_fdr_control <- readRDS("Results_files/Parameter_c/Results_with_fdr_control.Rds")
-}
-
 # Run analysis with default c if not yet done.
 if(!file.exists("Results_files/Parameter_c/Results_with_defaults.Rds")) {
   cl <- makeCluster(detectCores(logical = FALSE))
@@ -128,10 +123,21 @@ if(!file.exists("Results_files/Parameter_c/Results_with_defaults.Rds")) {
   saveRDS(results_with_defaults, "Results_files/Parameter_c/Results_with_defaults.Rds")
 }
 
-# Load results if saved earlier.
+# Load FDR-controlled results if saved earlier.
+if (file.exists("Results_files/Parameter_c/Results_with_fdr_control.Rds")) {
+  results_with_fdr_control <- readRDS("Results_files/Parameter_c/Results_with_fdr_control.Rds")
+}
+
+# Load results with defaults if saved earlier.
 if (file.exists("Results_files/Parameter_c/Results_with_defaults.Rds")) {
   results_with_defaults <- readRDS("Results_files/Parameter_c/Results_with_defaults.Rds")
 }
+
+# Add number of edges into results.
+results_with_fdr_control$edge_count <- (results_with_fdr_control$TPR + results_with_fdr_control$FPR) * 
+  (results_with_fdr_control$p1 - 1)
+results_with_defaults$edge_count <- (results_with_defaults$TPR + results_with_defaults$FPR) * 
+  (results_with_defaults$p1 - 1)
 
 # Aggregate results over p.
 agg_results <- aggregate(results_with_fdr_control, by = list(results_with_fdr_control$p1),
@@ -148,49 +154,52 @@ pdf("Figures/Supplementary/c_parameter_scores.pdf", width = 7, height = 9)
 par(mfrow = c(3,2))
 par(mgp = c(2, 1, 0))
 par(mar = c(3.1, 3.1, 0.2, 0.2))
+lty <- 2
+col = "blue"
 score <- "FDR"
-plot(p, agg_results[,score], type = "l", ylim = c(min(agg_results[,score], agg_results[,score]),
-                                                  max(agg_results[,score], agg_results2[,score])),
-     xlab = "Number of variables", ylab = score)
-lines(p, agg_results2[,score], col = "blue")
-legend("topright", legend = c("Default c", "FDR-controlled c"), lty = c(1,1), col = c("blue", "black"),
+plot(p, agg_results[,score], type = "l", xlab = "Number of variables", ylab = score,
+     ylim = c(min(agg_results[,score], agg_results[,score]),
+              max(agg_results[,score], agg_results2[,score])),
+     col = col, lty = lty)
+lines(p, agg_results2[,score], col = "black", lty = 1, lwd = 1)
+legend("topright", legend = c("Default c", "FDR-controlled c"), lty = c(1, lty), col = c("black", col),
        lwd = c(2,2))
 grid()
 
 score <- "FPR"
-plot(p, agg_results[,score], type = "l", ylim = c(0,
-                                                  max(agg_results[,score], agg_results2[,score])),
-     xlab = "Number of variables", ylab = score)
-lines(p, agg_results2[,score], col = "blue")
+plot(p, agg_results[,score], type = "l", xlab = "Number of variables", ylab = score,
+     ylim = c(0, max(agg_results[,score], agg_results2[,score])),
+     col = col, lty = lty)
+lines(p, agg_results2[,score], col = "black", lty = 1, lwd = 1)
 grid()
 
 score <- "MCC"
-plot(p, agg_results[,score], type = "l", ylim = c(min(agg_results[,score], agg_results[,score]),
-                                                  max(agg_results[,score], agg_results2[,score])),
-     xlab = "Number of variables", ylab = score)
-lines(p, agg_results2[,score], col = "blue")
+plot(p, agg_results[,score], type = "l", xlab = "Number of variables", ylab = score,
+     ylim = c(min(agg_results[,score], agg_results[,score]),
+              max(agg_results[,score], agg_results2[,score])),
+     col = col, lty = lty)
+lines(p, agg_results2[,score], col = "black", lty = 1, lwd = 1)
 grid()
 
 score <- "F1"
 plot(p, agg_results[,score], type = "l", ylim = c(min(agg_results[,score], agg_results[,score]),
                                                   max(agg_results[,score], agg_results2[,score])),
-     xlab = "Number of variables", ylab = score)
-lines(p, agg_results2[,score], col = "blue")
+     xlab = "Number of variables", ylab = score, col = col, lty = lty)
+lines(p, agg_results2[,score], col = "black", lty = 1, lwd = 1)
 grid()
 
 score <- "TPR"
 plot(p, agg_results[,score], type = "l", ylim = c(min(agg_results[,score], agg_results[,score]),
                                                   max(agg_results[,score], agg_results2[,score])),
-     xlab = "Number of variables", ylab = score)
-lines(p, agg_results2[,score], col = "blue")
+     xlab = "Number of variables", ylab = score, col = col, lty = lty)
+lines(p, agg_results2[,score], col = "black", lty = 1, lwd = 1)
 grid()
 
 score <- "Total number of connections"
-plot(p, edge_count, type = "l", ylim = c(0,
-                                         max(edge_count, edge_count2)),
-     xlab = "Number of variables", ylab = score)
-lines(p, edge_count2, col = "blue")
+plot(p, agg_results$edge_count, type = "l",
+     ylim = c(0, max(agg_results$edge_count, agg_results2$edge_count)),
+     xlab = "Number of variables", ylab = score, col = col, lty = lty)
+lines(p, agg_results2$edge_count, col = "black", lty = 1, lwd = 1)
 grid()
 
 dev.off()
-
