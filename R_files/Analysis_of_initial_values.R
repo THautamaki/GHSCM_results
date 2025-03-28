@@ -1,14 +1,7 @@
 library(GHSGEM)
 
-generate_initial_values <- function(p, seed) {
-  set.seed(seed)
-  A <- matrix(rnorm(p^2, 0, 0.05), p, p)
-  A <- (t(A) + A) / 2
-  diag(A) <- 1
-  return(A)
-}
-
-generate_initial_values <- function(p, seed, sd = 0.05) {
+# Function which generates random positive-definite matrix.
+generate_initial_values <- function(p, seed, sd = 0.1) {
   set.seed(seed)
   A <- matrix(rnorm(p^2, 0, sd), p, p)
   A <- (t(A) + A) / 2
