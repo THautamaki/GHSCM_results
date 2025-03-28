@@ -8,10 +8,19 @@ generate_initial_values <- function(p, seed) {
   return(A)
 }
 
+generate_initial_values <- function(p, seed, sd = 0.05) {
+  set.seed(seed)
+  A <- matrix(rnorm(p^2, 0, sd), p, p)
+  A <- (t(A) + A) / 2
+  diag(A) <- 1 + max(abs(eigen(A, only.values = TRUE)$value))
+  return(A)
+}
+
 # Possible network structures.
 structures <- c("random", "bdgraph_sf", "huge_sf", "hubs")
 
 # Analysis for the datasets with 100 variables.
+n <- 120
 p <- 100
 
 # Set path (no needed to change).
@@ -23,7 +32,7 @@ sim_hubs <- readRDS(file = paste0(path, "huge_hubs_n", n, "_p", p, ".Rds"))
 # Set number of initial values.
 n_inits <- 100
 # Set number of datasets.
-n_datasets <- length(sim_random)
+n_datasets <- length(sim_hubs)
 
 # Generate initial values.
 Sigma_inits <- array(dim = c(p, p, n_inits))
@@ -58,21 +67,22 @@ if (!file.exists("Results_files/Analysis_of_inits/Hub_Thetas_100_inits.rds")) {
 }
 
 # Load results if saved.
-if (file.exists("Results_files/Analysis_of_inits/Hubs_Thetas_100_inits.rda")) {
-  Thetas_p100 <- readRDS("Results_files/Analysis_of_inits/Hubs_Thetas_100_inits.rda")
+if (file.exists("Results_files/Analysis_of_inits/Hub_Thetas_100_inits.rds")) {
+  Thetas_p100 <- readRDS("Results_files/Analysis_of_inits/Hub_Thetas_100_inits.rds")
 }
 
 # Check which elements (connections) are not exact zeros or ones.
-indices <- data.frame()
+indices <- c()
 datanro <- c()
-for (i in 1:n_data) {
-  if (sum(which(Thetas_p100[[i]] > 0 & Thetas_p100[[i]] < 1)) > 0) {
+for (i in 1:n_datasets) {
+  inds <- which(Thetas_p100[[i]] > 0 & Thetas_p100[[i]] < 1 & lower.tri(Thetas_p100[[i]]), arr.ind = TRUE)
+  if (length(inds) > 0) {
     datanro <- c(datanro, i)
-    indices <- rbind(indices, which(Thetas_p100[[i]] > 0 & Thetas_p100[[i]] < 1, arr.ind = TRUE)[1,])
+    indices <- c(indices, list(inds))
     print(paste0("Dataset nro ", i))
-    print(which(Thetas_p100[[i]] > 0 & Thetas_p100[[i]] < 1, arr.ind = TRUE))
-    print(Thetas_p100[[i]][which(Thetas_p100[[i]] > 0 & Thetas_p100[[i]] < 1)])
-    print(paste0("Sum of those connections, which are not exact 0 or 1: ", sum((Thetas_p100[[i]] > 0 & Thetas_p100[[i]] < 1))/2))
+    print(inds)
+    print(Thetas_p100[[i]][inds])
+    print(paste0("Sum of those connections, which are not exact 0 or 1: ", length(inds)/2))
   }
 }
 
@@ -80,12 +90,16 @@ for (i in 1:n_data) {
 for (i in 1:length(datanro)) {
   dn <- datanro[i]
   map <- GHS_MAP_estimation(sim_hubs[[dn]]$data, verbose = 0)
-  print(map$Theta[indices[i,1], indices[i,2]])
+  print(map$Theta[indices[[i]]])
 }
 
 ########
 # Analysis for the datasets with 200 variables.
+n <- 120
 p <- 200
+
+# Set path (no needed to change).
+path <- paste0("Data/n", n, "_p", p, "/")
 
 # Load datasets.
 sim_huge_sf <- readRDS(file = paste0(path, "huge_scale-free_n", n, "_p", p, ".Rds"))
@@ -93,7 +107,7 @@ sim_huge_sf <- readRDS(file = paste0(path, "huge_scale-free_n", n, "_p", p, ".Rd
 # Set number of initial values.
 n_inits <- 50
 # Set number of datasets.
-n_datasets <- length(sim_random)
+n_datasets <- length(sim_huge_sf)
 
 # Generate initial values.
 Sigma_inits <- array(dim = c(p, p, n_inits))
@@ -132,16 +146,17 @@ if (file.exists("Results_files/Analysis_of_inits/Huge_sf_Thetas_50_inits.rds")) 
 }
 
 # Check which elements (connections) are not exact zeros or ones.
-indices <- data.frame()
+indices <- c()
 datanro <- c()
-for (i in 1:n_data) {
-  if (sum(which(Thetas_p200[[i]] > 0 & Thetas_p200[[i]] < 1)) > 0) {
+for (i in 1:n_datasets) {
+  inds <- which(Thetas_p200[[i]] > 0 & Thetas_p200[[i]] < 1 & lower.tri(Thetas_p200[[i]]), arr.ind = TRUE)
+  if (length(inds) > 0) {
     datanro <- c(datanro, i)
-    indices <- rbind(indices, which(Thetas_p200[[i]] > 0 & Thetas_p200[[i]] < 1, arr.ind = TRUE)[1,])
+    indices <- c(indices, list(inds))
     print(paste0("Dataset nro ", i))
-    print(which(Thetas_p100[[i]] > 0 & Thetas_p200[[i]] < 1, arr.ind = TRUE))
-    print(Thetas_p100[[i]][which(Thetas_p200[[i]] > 0 & Thetas_p200[[i]] < 1)])
-    print(paste0("Sum of those connections, which are not exact 0 or 1: ", sum((Thetas_p200[[i]] > 0 & Thetas_p200[[i]] < 1))/2))
+    print(inds)
+    print(Thetas_p200[[i]][inds])
+    print(paste0("Sum of those connections, which are not exact 0 or 1: ", length(inds)/2))
   }
 }
 
@@ -149,5 +164,5 @@ for (i in 1:n_data) {
 for (i in 1:length(datanro)) {
   dn <- datanro[i]
   map <- GHS_MAP_estimation(sim_huge_sf[[dn]]$data, verbose = 0)
-  print(map$Theta[indices[i,1], indices[i,2]])
+  print(map$Theta[indices[[i]]])
 }
