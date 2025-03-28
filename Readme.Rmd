@@ -55,7 +55,7 @@ The files in the repository are organized in the main directories as follows:
 
 The simulated datasets used in the article can always be created using the function `generate_datasets()` without arguments (the default arguments). It saves datasets in the `Data` directory in Rds and csv-format for R and MATLAB use, respectively.
 
-To run analyses using R methods, we created an R script named `Run_R_methods_and_combine_results.R` which serves as the main file for the simulation analysis. It has been well commented on, so we will not provide details here. It installs all necessary R packages, creates simulated datasets, runs R methods, combines all result files, and finally prints the results.
+To run analyses using R methods, we created an R script named `Run_simulations_R_methods_and_combine_results.R` which serves as the main file for the simulation analysis. It has been well commented on, so we will not provide details here. It installs all necessary R packages, creates simulated datasets, runs R methods, combines all result files, and finally prints the results.
 
 Each MATLAB method has `<method_name>_analysis.m` file to run simulations. They are all well-commented and can be run using MATLAB's `Run all sections` shortcut. Note that the helper functions should be placed into the `%userprofile%\Documents\MATLAB` folder (if a Windows machine) so that MATLAB can find them. The simulation results have run-to-run variance as we do not use fixed seeds for every MATLAB method (and StARS for GLASSO). The biggest difference in MCC we saw was about 0.012.
 

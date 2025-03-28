@@ -74,11 +74,11 @@ arguments). It saves datasets in the `Data` directory in Rds and
 csv-format for R and MATLAB use, respectively.
 
 To run analyses using R methods, we created an R script named
-`Run_R_methods_and_combine_results.R` which serves as the main file for
-the simulation analysis. It has been well commented on, so we will not
-provide details here. It installs all necessary R packages, creates
-simulated datasets, runs R methods, combines all result files, and
-finally prints the results.
+`Run_simulations_R_methods_and_combine_results.R` which serves as the
+main file for the simulation analysis. It has been well commented on, so
+we will not provide details here. It installs all necessary R packages,
+creates simulated datasets, runs R methods, combines all result files,
+and finally prints the results.
 
 Each MATLAB method has `<method_name>_analysis.m` file to run
 simulations. They are all well-commented and can be run using MATLAB’s
