@@ -81,20 +81,20 @@ par(mar = c(3.1, 3.1, 0.2, 0.2))
 plot(sample_sizes, fastGHS_agg_results$edge_count, type = "l", log = "x",
      ylim = c(1, max(fastGHS_agg_results$edge_count)),
      xlab = "Sample size", ylab = "Number of connections", lty = 1)
-lines(sample_sizes, fastGHS_agg_results$FPR*((p^2 - p) / 2), col = "blue", lty = 2)
-lines(sample_sizes, fastGHS_agg_results$TPR * (p-1), col = "green", lty = 4)
+lines(sample_sizes, fastGHS_agg_results$FPR*((p^2 - p) / 2), col = "red", lty = 4)
+lines(sample_sizes, fastGHS_agg_results$TPR * (p-1), col = "blue", lty = 2)
 abline(h = p-1, lty = 3, lwd = 2, col = "black")
 legend("topright", c("All estimated", "False positives", "True positives",
                      "In true network"),
-       col = c("black", "blue", "green", "black"), lty = c(1,2,4,3),
+       col = c("black", "red", "blue", "black"), lty = c(1,4,2,3),
        lwd = c(1,1,1,2))
 grid()
 
 plot(sample_sizes, GHSGEM_agg_results$edge_count, type = "l", log = "x",
      ylim = c(0, max(GHSGEM_agg_results$edge_count)),
      xlab = "Sample size", ylab = "Number of connections", lty = 1)
-lines(sample_sizes, GHSGEM_agg_results$FPR*((p^2 - p) / 2), col = "blue", lty = 2)
-lines(sample_sizes, GHSGEM_agg_results$TPR * (p-1), col = "green", lty = 4)
+lines(sample_sizes, GHSGEM_agg_results$FPR*((p^2 - p) / 2), col = "red", lty = 4)
+lines(sample_sizes, GHSGEM_agg_results$TPR * (p-1), col = "blue", lty = 2)
 abline(h = p-1, lty = 3, lwd = 2, col = "black")
 grid()
 dev.off()

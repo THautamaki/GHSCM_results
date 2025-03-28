@@ -163,7 +163,7 @@ plot(p, agg_results[,score], type = "l", xlab = "Number of variables", ylab = sc
      col = col, lty = lty)
 lines(p, agg_results2[,score], col = "black", lty = 1, lwd = 1)
 legend("topright", legend = c("Default c", "FDR-controlled c"), lty = c(1, lty), col = c("black", col),
-       lwd = c(2,2))
+       lwd = c(1,1))
 grid()
 
 score <- "FPR"
