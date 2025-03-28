@@ -129,7 +129,7 @@ Supplementary Figures S1, S2, and S3 can be created using the R script
 Analysis of the initial values of the GHS GEM algorithm, as presented in
 the supplementary material, can be performed using the R script
 `Analysis_of_initial_values.R` (Supplementary Table S1). Please note
-that the analysis requires several hours to complete, assuming a system
+that the analysis requires about 3 hours to complete, assuming a system
 with similar specifications is used, as described above.
 
 ### Parameter c in the global scale parameter formula
