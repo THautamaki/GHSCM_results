@@ -194,7 +194,7 @@ add_MATLAB_results <- function(results_list, methods, structures, sample_sizes, 
   return(results_list)
 }
 
-print_results <- function(scores, results_list, methods, structure, n, p) {
+print_results <- function(scores, results_list, methods, structure, n, p, return = FALSE) {
   mean_results <- sd_results <- data.frame()
   for (method in methods) {
     mean_scores <- apply(results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$results[, scores],
@@ -209,6 +209,9 @@ print_results <- function(scores, results_list, methods, structure, n, p) {
   }
   rownames(mean_results) <- rownames(sd_results) <- methods
   colnames(sd_results) <- scores
+  if (return) {
+    return(list(means = mean_results, sds = sd_results))
+  }
   cat(paste0("Mean of the performance scores with the ", structure, " network structure\n"))
   print(round(mean_results, 4))
   cat("\nSd of the performance scores\n")
@@ -217,33 +220,94 @@ print_results <- function(scores, results_list, methods, structure, n, p) {
 
 create_latex_table <- function(scores, results_list, methods, structure, n, p) {
   options(scipen = 999)
+  means_and_sds <- print_results(scores, results_list, methods, structure, n, p, TRUE)
+  df_means <- means_and_sds$means
+  df_sds <- means_and_sds$sds
   for (method in methods) {
-    cat(format(method, width = 14), " & ", sep = "")
+    if (method == "GHSGEM") {
+      cat(format("GHS GEM, $p_0=p-1$", width = 19), sep = "")
+    }
+    else if (method == "GHSGEM_p/2") {
+      cat(format("GHS GEM, $p_0=p/2$", width = 19), sep = "")
+    }
+    else if (method == "GHS_MCMC") {
+      cat(format("GHS MCMC", width = 19), sep = "")
+    }
+    else if (method == "GHS_LLA") {
+      cat(format("GHS LLA", width = 19), sep = "")
+    }
+    else if (method == "HSL_MCMC") {
+      cat(format("GHS-like MCMC", width = 19), sep = "")
+    }
+    else if (method == "HSL_ECM") {
+      cat(format("GHS-like ECM", width = 19), sep = "")
+    }
+    else if (method == "GLASSO") {
+      cat(format("GLASSO (StARS)", width = 19), sep = "")
+    }
+    else {
+      cat(format(method, width = 19), sep = "")
+    }
     for (score in scores) {
-      score_mean <- mean(results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$results[, score])
-      score_sd <- sd(results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$results[, score])
+      #score_mean <- mean(results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$results[, score])
+      #score_sd <- sd(results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$results[, score])
+      score_mean <- df_means[method, score]
+      score_sd <- df_sds[method, score]
+      best <- FALSE
+      if (!is.na(score_mean)) {
+        decr <- TRUE
+        if (any(score == c("FPR", "FDR", "sl_omega", "f_norm_rel"))) {
+          decr <- FALSE
+        }
+        ordered_scores <- df_means[, score][order(df_means[, score], decreasing = decr)]
+        if (any(score_mean == ordered_scores[1:2])) {
+          best <- TRUE
+        }
+      }
       if (score == "FPR") {
-        cat(format(paste0(sprintf("%.4f", round(score_mean, 4)), " (",
-                          sprintf("%.4f", round(score_sd, 4)), ") & "),  width = 24))
+        mean_score <- sprintf("%.4f", round(score_mean, 4))
+        if (best) {
+          mean_score <- paste0("\\textbf{", sprintf("%.4f", round(score_mean, 4)), "}")
+        }
+        cat(format(paste0(" & ", mean_score, " (",
+                                 sprintf("%.4f", round(score_sd, 4)), ")"),  width = 26))
       }
       else if (score == "time") {
         tot_time <- results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$total_time
         tot_time <- as.double(tot_time, units = "secs")
         rf_tot <- select_rounding(tot_time)
         rf_mean <- select_rounding(score_mean)
-        cat(paste0(format(sprintf(rf_mean[2], round(score_mean, as.numeric(rf_mean[1]))), width = 12),
-                   " & ", sprintf(rf_tot[2], round(tot_time, as.numeric(rf_tot[1]))), " \\\\ \n"))
+        cat(paste0(" & ", format(sprintf(rf_mean[2], round(score_mean, as.numeric(rf_mean[1]))), width = 12),
+                   " & ", sprintf(rf_tot[2], round(tot_time, as.numeric(rf_tot[1])))))
+      }
+      else if (score == "sl_omega") {
+        if (is.na(score_mean)) {
+          cat(format(" & .. ", width = 24))
+        }
+        else {
+          mean_score <- sprintf("%.2f", round(score_mean, 2))
+          if (best) {
+            mean_score <- paste0("\\textbf{", sprintf("%.2f", round(score_mean, 2)), "}")
+          }
+        cat(format(paste0(" & ", mean_score, " (",
+                                 sprintf("%.2f", round(score_sd, 2)), ")"), width = 25))
+        }
       }
       else {
         if (is.na(score_mean)) {
-          cat(format(".. & ", width = 22))
+          cat(format(" & .. ", width = 25))
         }
         else {
-          cat(format(paste0(sprintf("%.3f", round(score_mean, 3)), " (",
-                            sprintf("%.3f", round(score_sd, 3)), ") & "), width = 22))
+          mean_score <- sprintf("%.3f", round(score_mean, 3))
+          if (best) {
+            mean_score <- paste0("\\textbf{", sprintf("%.3f", round(score_mean, 3)), "}")
+          }
+          cat(format(paste0(" & ", mean_score, " (",
+                                   sprintf("%.3f", round(score_sd, 3)), ")"), width = 25))
         }
       }
     }
+    cat(" \\\\ \n")
   }
   options(scipen = 0)
 }

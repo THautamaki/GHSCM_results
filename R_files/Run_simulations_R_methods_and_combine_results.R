@@ -61,13 +61,13 @@ all_results <- add_R_results(all_results, R_methods, structures, sample_sizes, v
 all_results <- add_MATLAB_results(all_results, MATLAB_methods,
                                   structures, sample_sizes, variable_numbers)
 
-# Define scores which results will be printed.
-scores <- c("MCC", "TPR", "FPR", "FDR", "f_norm_rel", "sl_omega", "time")
-
 # Define the methods and which order they will be printed. GHS GEM has two results for random network
 # structure.
 random_methods <- c("GHSGEM", "GHSGEM_p/2", "GHS_MCMC", "GHS_LLA", "HSL_MCMC", "HSL_ECM", "GLASSO", "beam")
 other_methods <- c("GHSGEM", "GHS_MCMC", "GHS_LLA", "HSL_MCMC", "HSL_ECM", "GLASSO", "beam")
+
+# Define scores which results will be printed.
+scores <- c("MCC", "TPR", "FPR", "FDR", "f_norm_rel", "sl_omega", "time")
 
 # Print results.
 print_results(scores, all_results, random_methods, "random", 120, 100)
@@ -80,7 +80,10 @@ print_results(scores, all_results, other_methods, "bdgraph_sf", 120, 200)
 print_results(scores, all_results, other_methods, "huge_sf", 120, 200)
 print_results(scores, all_results, other_methods, "hubs", 120, 200)
 
-# Print LaTEX tabels.
+# Define scores for LaTeX tables.
+scores <- c("MCC", "TPR", "FDR", "sl_omega")
+
+# Print LaTeX tabels.
 create_latex_table(scores, all_results, random_methods, "random", 120, 100)
 create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 100)
 create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 100)
@@ -142,7 +145,7 @@ fastGHS_results_p200 <- add_MATLAB_results(fastGHS_results_p200, MATLAB_methods,
 print_results(scores, fastGHS_results_p200, random_methods, "random", 120, 200)
 
 ######
-# Create LaTEX tables.
+# Create LaTeX tables.
 create_latex_table(scores, fastGHS_results_p100, random_methods, "random", 120, 100)
 create_latex_table(scores, fastGHS_results_p100, other_methods, "bdgraph_sf", 120, 100)
 create_latex_table(scores, fastGHS_results_p100, other_methods, "huge_sf", 120, 100)

@@ -16,12 +16,19 @@ sim_hubs <- readRDS(file = paste0(path, "huge_hubs_n", n, "_p", p, ".Rds"))
 
 # Plot simulated network structures and save as eps-file.
 setEPS()
-postscript("Figures/Main_article/Simulated_structures.eps", width = 20, height = 5)
-
+postscript("Figures/Main_article/Fig_1_Simulated_structures.eps", width = 20, height = 5)
 par(mfrow = c(1,4))
 plot_network(sim_random[[1]]$theta, margins = c(0, 0, 0, 0), node_labels = NA)
 plot_network(sim_bdgraph_sf[[1]]$theta, margins = c(0, 0, 0, 0), node_labels = NA)
 plot_network(sim_huge_sf[[1]]$theta, margins = c(0, 0, 0, 0), node_labels = NA)
 plot_network(sim_hubs[[1]]$theta, margins = c(0, 0, 0, 0), node_labels = NA)
+dev.off()
 
+# Plot simulated network structures and save as pdf-file.
+pdf("Figures/Supplementary/Simulated_structures.pdf", width = 20, height = 5)
+par(mfrow = c(1,4))
+plot_network(sim_random[[1]]$theta, margins = c(0, 0, 0, 0), node_labels = NA)
+plot_network(sim_bdgraph_sf[[1]]$theta, margins = c(0, 0, 0, 0), node_labels = NA)
+plot_network(sim_huge_sf[[1]]$theta, margins = c(0, 0, 0, 0), node_labels = NA)
+plot_network(sim_hubs[[1]]$theta, margins = c(0, 0, 0, 0), node_labels = NA)
 dev.off()
