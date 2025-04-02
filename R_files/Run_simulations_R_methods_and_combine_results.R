@@ -63,7 +63,7 @@ all_results <- add_MATLAB_results(all_results, MATLAB_methods,
 
 # Define the methods and which order they will be printed. GHS GEM has two results for random network
 # structure.
-random_methods <- c("GHSGEM", "GHSGEM_p/2", "GHS_MCMC", "GHS_LLA", "HSL_MCMC", "HSL_ECM", "GLASSO", "beam")
+random_methods <- c("GHSGEM_p/2", "GHSGEM", "GHS_MCMC", "GHS_LLA", "HSL_MCMC", "HSL_ECM", "GLASSO", "beam")
 other_methods <- c("GHSGEM", "GHS_MCMC", "GHS_LLA", "HSL_MCMC", "HSL_ECM", "GLASSO", "beam")
 
 # Define scores which results will be printed.
@@ -80,7 +80,7 @@ print_results(scores, all_results, other_methods, "bdgraph_sf", 120, 200)
 print_results(scores, all_results, other_methods, "huge_sf", 120, 200)
 print_results(scores, all_results, other_methods, "hubs", 120, 200)
 
-# Define scores for LaTeX tables.
+# Define scores for LaTeX tables in main paper.
 scores <- c("MCC", "TPR", "FDR", "sl_omega")
 
 # Print LaTeX tabels.
@@ -104,6 +104,10 @@ for (n in sample_sizes) {
     }
   }
 }
+
+# Create runtime table.
+create_runtime_table(all_results, other_methods, structures, sample_sizes, variable_numbers)
+
 
 #######
 # Results of the fastGHS method with p = 100.
@@ -152,3 +156,23 @@ create_latex_table(scores, fastGHS_results_p100, other_methods, "huge_sf", 120, 
 create_latex_table(scores, fastGHS_results_p100, other_methods, "hubs", 120, 100)
 
 create_latex_table(scores, fastGHS_results_p200, random_methods, "random", 120, 200)
+
+
+######
+# Create LaTeX tables for supplementary material.
+# Define scores.
+scores <- c("FPR", "f_norm_rel", "time")
+
+# Print LaTeX tabels.
+create_latex_table(scores, all_results, random_methods, "random", 120, 100)
+create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 100)
+create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 100)
+create_latex_table(scores, all_results, other_methods, "hubs", 120, 100)
+
+create_latex_table(scores, all_results, random_methods, "random", 120, 200)
+create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 200)
+create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 200)
+create_latex_table(scores, all_results, other_methods, "hubs", 120, 200)
+
+
+all_results[["GLASSO"]][[structures[1]]][[paste0("n", n, "_p", p)]]$total_time

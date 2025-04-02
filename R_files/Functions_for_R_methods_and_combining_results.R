@@ -155,12 +155,12 @@ add_R_results <- function(results_list, methods, structures, sample_sizes, varia
           if (tolower(method) == "ghsgem" & tolower(structure) == "random") {
             results <- readRDS(paste0(path, structure, "_p", p, "_", method, "_results_2.Rds"))
             results_list[[paste0(method, "_p/2")]][[structure]][[paste0("n", n, "_p", p)]]$results <- results$results
-            results_list[[paste0(method, "_p/2")]][[structure]][[paste0("n", n, "_p", p)]]$total_time <- results$total_time
+            results_list[[paste0(method, "_p/2")]][[structure]][[paste0("n", n, "_p", p)]]$total_time <- as.double(results$total_time, units = "secs")
           }
           path <- paste0("Results_files/p",p, "/", method, "/")
           results <- readRDS(paste0(path, structure, "_p", p, "_", method, "_results.Rds"))
           results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$results <- results$results
-          results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$total_time <- results$total_time
+          results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$total_time <- as.double(results$total_time, units = "secs")
         }
       }
     }
@@ -270,7 +270,7 @@ create_latex_table <- function(scores, results_list, methods, structure, n, p) {
           mean_score <- paste0("\\textbf{", sprintf("%.4f", round(score_mean, 4)), "}")
         }
         cat(format(paste0(" & ", mean_score, " (",
-                                 sprintf("%.4f", round(score_sd, 4)), ")"),  width = 26))
+                                 sprintf("%.4f", round(score_sd, 4)), ")"),  width = 27))
       }
       else if (score == "time") {
         tot_time <- results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$total_time
@@ -330,4 +330,65 @@ select_rounding <- function(value) {
     format <- "%.0f"
   }
   return(c(rounding, format))
+}
+
+calculate_runtimes <- function(all_results, methods, structures, sample_sizes, variable_numbers) {
+  # Runtimes over all datasets and structures.
+  runtimes <- data.frame()
+  for (method in other_methods) {
+    for (n in sample_sizes) {
+      c_runtime <- c_totaltime <- c()
+      for (p in variable_numbers) {
+        sum_runtime <- 0
+        sum_totaltime <- 0
+        for (structure in structures) {
+          sum_runtime <- sum_runtime + sum(all_results[[method]][[structure]][[paste0("n", n, "_p", p)]]$results$time)
+          sum_totaltime <- sum_totaltime + all_results[[method]][[structure]][[paste0("n", n, "_p", p)]]$total_time
+        }
+        c_runtime <- c(c_runtime, sum_runtime)
+        c_totaltime <- c(c_totaltime, sum_totaltime)
+      }
+    }
+    runtimes <- rbind(runtimes, c(c_runtime / 200, c_totaltime / 4))
+  }
+  
+  colnames(runtimes) <- c("rt_p100", "rt_p200", "tt_p100", "tt_p200")
+  rownames(runtimes) <- other_methods
+  return(runtimes)
+}
+
+create_runtime_table <- function(all_results, methods, structures, sample_sizes, variable_numbers) {
+  runtimes <- calculate_runtimes(all_results, methods, structures, sample_sizes, variable_numbers)
+  methods <- rownames(runtimes)
+  for (method in methods) {
+    if (method == "GHSGEM") {
+      cat(format("GHS GEM, $p_0=p-1$", width = 19), sep = "")
+    }
+    else if (method == "GHSGEM_p/2") {
+      cat(format("GHS GEM, $p_0=p/2$", width = 19), sep = "")
+    }
+    else if (method == "GHS_MCMC") {
+      cat(format("GHS MCMC", width = 19), sep = "")
+    }
+    else if (method == "GHS_LLA") {
+      cat(format("GHS LLA", width = 19), sep = "")
+    }
+    else if (method == "HSL_MCMC") {
+      cat(format("GHS-like MCMC", width = 19), sep = "")
+    }
+    else if (method == "HSL_ECM") {
+      cat(format("GHS-like ECM", width = 19), sep = "")
+    }
+    else if (method == "GLASSO") {
+      cat(format("GLASSO (StARS)", width = 19), sep = "")
+    }
+    else {
+      cat(format(method, width = 19), sep = "")
+    }
+    for (time in runtimes[method,]) {
+      r_and_f <- select_rounding(time)
+      cat(" & ", format(sprintf(r_and_f[2], round(time, as.numeric(r_and_f[1]))), width = 12))
+    }
+    cat("\\\\ \n")
+  }
 }
