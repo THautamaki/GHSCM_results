@@ -270,27 +270,27 @@ create_latex_table <- function(scores, results_list, methods, structure, n, p) {
           mean_score <- paste0("\\textbf{", sprintf("%.4f", round(score_mean, 4)), "}")
         }
         cat(format(paste0(" & ", mean_score, " (",
-                                 sprintf("%.4f", round(score_sd, 4)), ")"),  width = 27))
+                          sprintf("%.4f", round(score_sd, 4)), ")"),  width = 27))
       }
       else if (score == "time") {
         tot_time <- results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$total_time
         tot_time <- as.double(tot_time, units = "secs")
         rf_tot <- select_rounding(tot_time)
         rf_mean <- select_rounding(score_mean)
-        cat(paste0(" & ", format(sprintf(rf_mean[2], round(score_mean, as.numeric(rf_mean[1]))), width = 12),
-                   " & ", sprintf(rf_tot[2], round(tot_time, as.numeric(rf_tot[1])))))
+        cat(paste0(" & ", format(sprintf(rf_mean[2], round(score_mean, as.numeric(rf_mean[1]))), width = 6),
+                   " & ", format(sprintf(rf_tot[2], round(tot_time, as.numeric(rf_tot[1]))), width = 6)))
       }
       else if (score == "sl_omega") {
         if (is.na(score_mean)) {
-          cat(format(" & .. ", width = 24))
+          cat(format(" & .. ", width = 23))
         }
         else {
           mean_score <- sprintf("%.2f", round(score_mean, 2))
           if (best) {
             mean_score <- paste0("\\textbf{", sprintf("%.2f", round(score_mean, 2)), "}")
           }
-        cat(format(paste0(" & ", mean_score, " (",
-                                 sprintf("%.2f", round(score_sd, 2)), ")"), width = 25))
+          cat(format(paste0(" & ", mean_score, " (",
+                            sprintf("%.2f", round(score_sd, 2)), ")"), width = 23))
         }
       }
       else {
@@ -303,7 +303,7 @@ create_latex_table <- function(scores, results_list, methods, structure, n, p) {
             mean_score <- paste0("\\textbf{", sprintf("%.3f", round(score_mean, 3)), "}")
           }
           cat(format(paste0(" & ", mean_score, " (",
-                                   sprintf("%.3f", round(score_sd, 3)), ")"), width = 25))
+                            sprintf("%.3f", round(score_sd, 3)), ")"), width = 25))
         }
       }
     }

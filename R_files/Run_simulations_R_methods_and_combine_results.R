@@ -94,19 +94,23 @@ create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 200)
 create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 200)
 create_latex_table(scores, all_results, other_methods, "hubs", 120, 200)
 
-# Proportion of the tau's tuning times.
+# Create runtime table.
+create_runtime_table(all_results, other_methods, structures, sample_sizes, variable_numbers)
+
+
+#######
+# GHS LLA runtimes and proportion of the tau's tuning times.
 for (n in sample_sizes) {
   for (p in variable_numbers) {
     cat("n: ", n, ", p: ", p, "\n", sep = "")
     for (structure in structures) {
       tau_prop <- mean(all_results$GHS_LLA[[structure]][[paste0("n", n, "_p", p)]]$results$tau_prop)
-      cat(format(structure, width = 10), ": ", round(tau_prop, 3), "\n", sep = "")
+      tau_time <- mean(all_results$GHS_LLA[[structure]][[paste0("n", n, "_p", p)]]$results$tau_time)
+      alg_time <- mean(all_results$GHS_LLA[[structure]][[paste0("n", n, "_p", p)]]$results$alg_time)
+      cat(format(structure, width = 10), " & ", round(tau_time), " & ", round(alg_time), " & ", round(tau_prop, 3)*100, "\n", sep = "")
     }
   }
 }
-
-# Create runtime table.
-create_runtime_table(all_results, other_methods, structures, sample_sizes, variable_numbers)
 
 
 #######
@@ -138,7 +142,6 @@ print_results(scores, fastGHS_results_p100, other_methods, "bdgraph_sf", 120, 10
 print_results(scores, fastGHS_results_p100, other_methods, "huge_sf", 120, 100)
 print_results(scores, fastGHS_results_p100, other_methods, "hubs", 120, 100)
 
-######
 # Results of the fastGHS method with p = 200 and network structure is random.
 # Read results from the files.
 fastGHS_results_p200 <- list()
@@ -148,7 +151,6 @@ fastGHS_results_p200 <- add_MATLAB_results(fastGHS_results_p200, MATLAB_methods,
 # Print results.
 print_results(scores, fastGHS_results_p200, random_methods, "random", 120, 200)
 
-######
 # Create LaTeX tables.
 create_latex_table(scores, fastGHS_results_p100, random_methods, "random", 120, 100)
 create_latex_table(scores, fastGHS_results_p100, other_methods, "bdgraph_sf", 120, 100)
@@ -159,9 +161,9 @@ create_latex_table(scores, fastGHS_results_p200, random_methods, "random", 120, 
 
 
 ######
-# Create LaTeX tables for supplementary material.
+# Create full LaTeX tables for supplementary material.
 # Define scores.
-scores <- c("FPR", "f_norm_rel", "time")
+scores <- c("MCC", "TPR", "FPR", "FDR", "f_norm_rel", "sl_omega", "time")
 
 # Print LaTeX tabels.
 create_latex_table(scores, all_results, random_methods, "random", 120, 100)
@@ -174,5 +176,3 @@ create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 200)
 create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 200)
 create_latex_table(scores, all_results, other_methods, "hubs", 120, 200)
 
-
-all_results[["GLASSO"]][[structures[1]]][[paste0("n", n, "_p", p)]]$total_time
