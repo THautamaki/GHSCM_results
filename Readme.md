@@ -27,10 +27,13 @@ methods can be found on the following GitHub pages:
 
 ## Real-world datasets
 
-The CEU dataset is available on Sanger Institute’s website:
-<https://ftp.sanger.ac.uk/pub/genevar>, and the DLBC dataset is
-available on the website of the PRECISE framework:
-<https://mjha.shinyapps.io/PRECISE>.
+The CEU dataset is available on the Sanger Institute’s website at
+<https://ftp.sanger.ac.uk/pub/genevar>, and the data file is named
+`CEU_parents-normalised.csv`. The DLBC dataset is available on the
+website of the PRECISE framework at <https://mjha.shinyapps.io/PRECISE>.
+Go to the `Download` section and download the `Pan-Cancer RPPA data`
+file (the actual downloaded file is named `TCGA_RPPA.zip`). Extract the
+file, and the data file needed is named `rppadat_DLBC.rda`.
 
 ## Structure of the repository
 
@@ -89,8 +92,7 @@ run-to-run variance as we do not use fixed seeds for every MATLAB method
 (and StARS for GLASSO). The biggest difference in MCC we saw was about
 0.012.
 
-> [!CAUTION]
-> Please note that if a similar system is used, as
+> \[!CAUTION\] Please note that if a similar system is used, as
 > described in the article (a 16-core AMD Ryzen 9 7950X3D processor and
 > 64 GB of RAM), all simulations require approximately 3.5 days to
 > complete.

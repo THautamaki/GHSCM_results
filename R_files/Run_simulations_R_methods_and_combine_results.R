@@ -176,3 +176,8 @@ create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 200)
 create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 200)
 create_latex_table(scores, all_results, other_methods, "hubs", 120, 200)
 
+
+######
+# Create LaTeX table of mean number of false positives for supplementary material.
+create_false_positives_table(all_results, random_methods, structures, sample_sizes, variable_numbers)
+

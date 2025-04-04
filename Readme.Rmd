@@ -27,7 +27,7 @@ The original MATLAB codes of the GHS Gibbs sampler (GHS MCMC), GHS local linear 
 
 ## Real-world datasets
 
-The CEU dataset is available on Sanger Institute's website: <https://ftp.sanger.ac.uk/pub/genevar>, and the DLBC dataset is available on the website of the PRECISE framework: <https://mjha.shinyapps.io/PRECISE>.
+The CEU dataset is available on the Sanger Institute's website at <https://ftp.sanger.ac.uk/pub/genevar>, and the data file is named `CEU_parents-normalised.csv`. The DLBC dataset is available on the website of the PRECISE framework at <https://mjha.shinyapps.io/PRECISE>. Go to the `Download` section and download the `Pan-Cancer RPPA data` file (the actual downloaded file is named `TCGA_RPPA.zip`). Extract the file, and the data file needed is named `rppadat_DLBC.rda`.
 
 ## Structure of the repository
 

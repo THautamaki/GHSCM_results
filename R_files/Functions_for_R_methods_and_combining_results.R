@@ -200,8 +200,10 @@ print_results <- function(scores, results_list, methods, structure, n, p, return
     mean_scores <- apply(results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$results[, scores],
                          2, mean)
     mean_scores <- as.list(mean_scores)
-    tot_time <- results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$total_time
-    mean_scores$total_time <- as.double(tot_time, units = "secs")
+    if (any(scores == "time")) {
+      tot_time <- results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$total_time
+      mean_scores$total_time <- as.double(tot_time, units = "secs")
+    }
     sd_scores <- apply(results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$results[, scores],
                        2, sd)
     mean_results <- rbind(mean_results, mean_scores)
@@ -351,7 +353,6 @@ calculate_runtimes <- function(all_results, methods, structures, sample_sizes, v
     }
     runtimes <- rbind(runtimes, c(c_runtime / 200, c_totaltime / 4))
   }
-  
   colnames(runtimes) <- c("rt_p100", "rt_p200", "tt_p100", "tt_p200")
   rownames(runtimes) <- other_methods
   return(runtimes)
@@ -359,7 +360,6 @@ calculate_runtimes <- function(all_results, methods, structures, sample_sizes, v
 
 create_runtime_table <- function(all_results, methods, structures, sample_sizes, variable_numbers) {
   runtimes <- calculate_runtimes(all_results, methods, structures, sample_sizes, variable_numbers)
-  methods <- rownames(runtimes)
   for (method in methods) {
     if (method == "GHSGEM") {
       cat(format("GHS GEM, $p_0=p-1$", width = 19), sep = "")
@@ -390,5 +390,70 @@ create_runtime_table <- function(all_results, methods, structures, sample_sizes,
       cat(" & ", format(sprintf(r_and_f[2], round(time, as.numeric(r_and_f[1]))), width = 12))
     }
     cat("\\\\ \n")
+  }
+}
+
+calculate_false_positives <- function(all_results, methods, structures, sample_sizes, variable_numbers) {
+  other_methods <- methods[-1]
+  df_false_positives <- data.frame(row.names = methods)
+  i <- 1
+  for (n in sample_sizes) {
+    for (p in variable_numbers) {
+      for (structure in structures) {
+        if (structure == "random") {
+          positives <- print_results(c("TPR", "FPR"), all_results, methods, structure, n, p, return = TRUE)
+          df_false_positives[, i] <- positives$means$FPR * (p*(p-1)/2 - (p/2))
+        }
+        else if (structure == "hubs") {
+          positives <- print_results(c("TPR", "FPR"), all_results, other_methods, structure, n, p, return = TRUE)
+          df_false_positives[other_methods, i] <- positives$means$FPR * (p*(p-1)/2 - (p - p/20))
+        }
+        else {
+          positives <- print_results(c("TPR", "FPR"), all_results, other_methods, structure, n, p, return = TRUE)
+          df_false_positives[other_methods, i] <- positives$means$FPR * (p*(p-1)/2 - (p - 1))
+        }
+        i <- i + 1
+      }
+    }
+  }
+  colnames(df_false_positives) <- c(structures, structures)
+  return(df_false_positives)
+}
+
+create_false_positives_table <- function(all_results, methods, structures, sample_sizes, variable_numbers) {
+  false_positives <- calculate_false_positives(all_results, methods, structures, sample_sizes, variable_numbers)
+  for (method in methods) {
+    if (method == "GHSGEM") {
+      cat(format("GHS GEM, $p_0=p-1$", width = 19), sep = "")
+    }
+    else if (method == "GHSGEM_p/2") {
+      cat(format("GHS GEM, $p_0=p/2$", width = 19), sep = "")
+    }
+    else if (method == "GHS_MCMC") {
+      cat(format("GHS MCMC", width = 19), sep = "")
+    }
+    else if (method == "GHS_LLA") {
+      cat(format("GHS LLA", width = 19), sep = "")
+    }
+    else if (method == "HSL_MCMC") {
+      cat(format("GHS-like MCMC", width = 19), sep = "")
+    }
+    else if (method == "HSL_ECM") {
+      cat(format("GHS-like ECM", width = 19), sep = "")
+    }
+    else if (method == "GLASSO") {
+      cat(format("GLASSO (StARS)", width = 19), sep = "")
+    }
+    else {
+      cat(format(method, width = 19), sep = "")
+    }
+    for (fp in false_positives[method,]) {
+      if (is.na(fp)) {
+        cat(format(" & .. ", width = 12))
+        next
+      }
+      cat(" & ", format(sprintf("%i", round(fp, 0)), width = 9), sep = "")
+    }
+    cat(" \\\\ \n")
   }
 }
