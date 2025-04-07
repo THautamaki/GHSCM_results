@@ -131,9 +131,9 @@ Supplementary Figures S1, S2, and S3 can be created using the R script
 
 Analysis of the initial values of the GHS GEM algorithm, as presented in
 the supplementary material, can be performed using the R script
-`Analysis_of_initial_values.R` (Supplementary Table S1). Please note
-that the analysis requires about 3 hours to complete, assuming a system
-with similar specifications is used, as described above.
+`Analysis_of_initial_values.R` (Supplementary Table S1 and S2). Please
+note that the analysis requires about 3.5 hours to complete, assuming a
+system with similar specifications is used, as described above.
 
 ### Parameter c in the global scale parameter formula
 
@@ -142,11 +142,21 @@ Supplementary Figure S4 can be created using the R script
 approximately 5 hours to complete, assuming a system with similar
 specifications is used, as described above.
 
+### Details of the simulated datasets
+
+Supplementary Figures S5 and S6 can be created using the R script
+`Plot_simulated_structures.R`.
+
+### Complete results of the simulations
+
+Supplementary Tables S3–S6 can be created using the main R script
+`Run_simulations_R_methods_and_combine_results.R` (lines 104–138).
+
 ### Results with the fastGHS method
 
 We did not include the fastGHS method results in the main article, but
 they can be reproduced using the same R script used for the main results
-(`Run_R_methods_and_combine_results.R`, lines from 102 forward). The
-script contains code to create Supplementary Tables S2 and S3. We also
+(`Run_R_methods_and_combine_results.R`, lines from 143 forward). The
+script contains code to create Supplementary Tables S7 and S8. We also
 did some additional analysis, which can be reproduced using the R script
-`Additional_fastGHS_analysis.R` (Supplementary Figures S5 and S6).
+`Additional_fastGHS_analysis.R` (Supplementary Figures S7 and S8).

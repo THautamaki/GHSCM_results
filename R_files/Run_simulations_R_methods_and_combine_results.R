@@ -84,22 +84,42 @@ print_results(scores, all_results, other_methods, "hubs", 120, 200)
 scores <- c("MCC", "TPR", "FDR", "sl_omega")
 
 # Print LaTeX tabels.
-create_latex_table(scores, all_results, random_methods, "random", 120, 100)
-create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 100)
-create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 100)
-create_latex_table(scores, all_results, other_methods, "hubs", 120, 100)
+# create_latex_table(scores, all_results, random_methods, "random", 120, 100)
+# create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 100)
+# create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 100)
+# create_latex_table(scores, all_results, other_methods, "hubs", 120, 100)
 
+# Table 1.
 create_latex_table(scores, all_results, random_methods, "random", 120, 200)
 create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 200)
 create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 200)
 create_latex_table(scores, all_results, other_methods, "hubs", 120, 200)
 
-# Create runtime table.
-create_runtime_table(all_results, other_methods, structures, sample_sizes, variable_numbers)
+#######
+# Next lines are all for Supplementary Materials.
 
+######
+# Create full LaTeX tables for supplementary material.
+# Define scores.
+scores <- c("MCC", "TPR", "FPR", "FDR", "f_norm_rel", "sl_omega", "time")
+
+# Print LaTeX tabels. First, p = 100.
+# Supplementary Table S4.
+create_latex_table(scores, all_results, random_methods, "random", 120, 100)
+create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 100)
+create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 100)
+create_latex_table(scores, all_results, other_methods, "hubs", 120, 100)
+
+# Next, p = 200
+# Supplementary Table S5.
+create_latex_table(scores, all_results, random_methods, "random", 120, 200)
+create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 200)
+create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 200)
+create_latex_table(scores, all_results, other_methods, "hubs", 120, 200)
 
 #######
 # GHS LLA runtimes and proportion of the tau's tuning times.
+# Supplementary Table S3.
 for (n in sample_sizes) {
   for (p in variable_numbers) {
     cat("n: ", n, ", p: ", p, "\n", sep = "")
@@ -112,8 +132,12 @@ for (n in sample_sizes) {
   }
 }
 
+######
+# Create LaTeX table of mean number of false positives for supplementary material.
+# Supplementary Table S6.
+create_false_positives_table(all_results, random_methods, structures, sample_sizes, variable_numbers)
 
-#######
+
 # Results of the fastGHS method with p = 100.
 # Initialize paramaters.
 sample_sizes <- c(120)
@@ -152,32 +176,16 @@ fastGHS_results_p200 <- add_MATLAB_results(fastGHS_results_p200, MATLAB_methods,
 print_results(scores, fastGHS_results_p200, random_methods, "random", 120, 200)
 
 # Create LaTeX tables.
+# Supplementary Table S7.
 create_latex_table(scores, fastGHS_results_p100, random_methods, "random", 120, 100)
 create_latex_table(scores, fastGHS_results_p100, other_methods, "bdgraph_sf", 120, 100)
 create_latex_table(scores, fastGHS_results_p100, other_methods, "huge_sf", 120, 100)
 create_latex_table(scores, fastGHS_results_p100, other_methods, "hubs", 120, 100)
 
+# Supplementary Table S8.
 create_latex_table(scores, fastGHS_results_p200, random_methods, "random", 120, 200)
 
 
 ######
-# Create full LaTeX tables for supplementary material.
-# Define scores.
-scores <- c("MCC", "TPR", "FPR", "FDR", "f_norm_rel", "sl_omega", "time")
-
-# Print LaTeX tabels.
-create_latex_table(scores, all_results, random_methods, "random", 120, 100)
-create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 100)
-create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 100)
-create_latex_table(scores, all_results, other_methods, "hubs", 120, 100)
-
-create_latex_table(scores, all_results, random_methods, "random", 120, 200)
-create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 200)
-create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 200)
-create_latex_table(scores, all_results, other_methods, "hubs", 120, 200)
-
-
-######
-# Create LaTeX table of mean number of false positives for supplementary material.
-create_false_positives_table(all_results, random_methods, structures, sample_sizes, variable_numbers)
-
+# Create runtime table. Not presented in the paper or Supplementary Material.
+create_runtime_table(all_results, other_methods, structures, sample_sizes, variable_numbers)
