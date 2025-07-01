@@ -220,17 +220,17 @@ print_results <- function(scores, results_list, methods, structure, n, p, return
   print(round(sd_results, 4))
 }
 
-create_latex_table <- function(scores, results_list, methods, structure, n, p) {
+create_latex_table <- function(scores, results_list, methods, structure, n, p, highlight_best = TRUE) {
   options(scipen = 999)
   means_and_sds <- print_results(scores, results_list, methods, structure, n, p, TRUE)
   df_means <- means_and_sds$means
   df_sds <- means_and_sds$sds
   for (method in methods) {
     if (method == "GHSGEM") {
-      cat(format("GHS GEM, $p_0=p-1$", width = 19), sep = "")
+      cat(format("GHS CM, $p_0=p-1$", width = 19), sep = "")
     }
     else if (method == "GHSGEM_p/2") {
-      cat(format("GHS GEM, $p_0=p/2$", width = 19), sep = "")
+      cat(format("GHS CM, $p_0=p/2$", width = 19), sep = "")
     }
     else if (method == "GHS_MCMC") {
       cat(format("GHS MCMC", width = 19), sep = "")
@@ -268,7 +268,7 @@ create_latex_table <- function(scores, results_list, methods, structure, n, p) {
       }
       if (score == "FPR") {
         mean_score <- sprintf("%.4f", round(score_mean, 4))
-        if (best) {
+        if (best & highlight_best) {
           mean_score <- paste0("\\textbf{", sprintf("%.4f", round(score_mean, 4)), "}")
         }
         cat(format(paste0(" & ", mean_score, " (",
@@ -288,7 +288,7 @@ create_latex_table <- function(scores, results_list, methods, structure, n, p) {
         }
         else {
           mean_score <- sprintf("%.2f", round(score_mean, 2))
-          if (best) {
+          if (best & highlight_best) {
             mean_score <- paste0("\\textbf{", sprintf("%.2f", round(score_mean, 2)), "}")
           }
           cat(format(paste0(" & ", mean_score, " (",
@@ -301,7 +301,7 @@ create_latex_table <- function(scores, results_list, methods, structure, n, p) {
         }
         else {
           mean_score <- sprintf("%.3f", round(score_mean, 3))
-          if (best) {
+          if (best & highlight_best) {
             mean_score <- paste0("\\textbf{", sprintf("%.3f", round(score_mean, 3)), "}")
           }
           cat(format(paste0(" & ", mean_score, " (",
@@ -362,10 +362,10 @@ create_runtime_table <- function(all_results, methods, structures, sample_sizes,
   runtimes <- calculate_runtimes(all_results, methods, structures, sample_sizes, variable_numbers)
   for (method in methods) {
     if (method == "GHSGEM") {
-      cat(format("GHS GEM, $p_0=p-1$", width = 19), sep = "")
+      cat(format("GHS CM, $p_0=p-1$", width = 19), sep = "")
     }
     else if (method == "GHSGEM_p/2") {
-      cat(format("GHS GEM, $p_0=p/2$", width = 19), sep = "")
+      cat(format("GHS CM, $p_0=p/2$", width = 19), sep = "")
     }
     else if (method == "GHS_MCMC") {
       cat(format("GHS MCMC", width = 19), sep = "")
@@ -424,10 +424,10 @@ create_false_positives_table <- function(all_results, methods, structures, sampl
   false_positives <- calculate_false_positives(all_results, methods, structures, sample_sizes, variable_numbers)
   for (method in methods) {
     if (method == "GHSGEM") {
-      cat(format("GHS GEM, $p_0=p-1$", width = 19), sep = "")
+      cat(format("GHS CM, $p_0=p-1$", width = 19), sep = "")
     }
     else if (method == "GHSGEM_p/2") {
-      cat(format("GHS GEM, $p_0=p/2$", width = 19), sep = "")
+      cat(format("GHS CM, $p_0=p/2$", width = 19), sep = "")
     }
     else if (method == "GHS_MCMC") {
       cat(format("GHS MCMC", width = 19), sep = "")

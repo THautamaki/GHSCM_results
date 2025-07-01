@@ -23,6 +23,9 @@ if(!require("pulsar", quietly = TRUE)) {
 if(!require("igraph", quietly = TRUE)) {
   install.packages("igraph")
 }
+if(!require("R.matlab", quietly = TRUE)) {
+  install.packages("R.matlab")
+}
 
 # Load packages.
 library(GHSGEM)
@@ -46,7 +49,7 @@ if (!data_generated) {
 sample_sizes <- c(120)
 variable_numbers <- c(100, 200)
 structures <- c("random", "bdgraph_sf", "huge_sf", "hubs")
-R_methods <- c("GHSGEM", "GLASSO", "beam")
+R_methods <- c("GHSGEM", "GLASSO", "fastGHS")
 MATLAB_methods <- c("GHS_MCMC", "GHS_LLA", "HSL_MCMC", "HSL_ECM")
 
 # Run all R methods if not yet run.
@@ -63,8 +66,8 @@ all_results <- add_MATLAB_results(all_results, MATLAB_methods,
 
 # Define the methods and which order they will be printed. GHS GEM has two results for random network
 # structure.
-random_methods <- c("GHSGEM_p/2", "GHSGEM", "GHS_MCMC", "GHS_LLA", "HSL_MCMC", "HSL_ECM", "GLASSO", "beam")
-other_methods <- c("GHSGEM", "GHS_MCMC", "GHS_LLA", "HSL_MCMC", "HSL_ECM", "GLASSO", "beam")
+random_methods <- c("GHSGEM_p/2", "GHSGEM", "GHS_MCMC", "fastGHS", "GHS_LLA", "HSL_MCMC", "HSL_ECM", "GLASSO")
+other_methods <- c("GHSGEM", "GHS_MCMC", "fastGHS", "GHS_LLA", "HSL_MCMC", "HSL_ECM", "GLASSO")
 
 # Define scores which results will be printed.
 scores <- c("MCC", "TPR", "FPR", "FDR", "f_norm_rel", "sl_omega", "time")
@@ -83,35 +86,34 @@ print_results(scores, all_results, other_methods, "hubs", 120, 200)
 # Define scores for LaTeX tables in main paper.
 scores <- c("MCC", "TPR", "FDR", "sl_omega")
 
-# Print LaTeX tabels.
-# create_latex_table(scores, all_results, random_methods, "random", 120, 100)
-# create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 100)
-# create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 100)
-# create_latex_table(scores, all_results, other_methods, "hubs", 120, 100)
+# Print LaTeX tabels (Table 1 in paper).
+create_latex_table(scores, all_results, random_methods, "random", 120, 100)
+create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 100)
+create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 100)
+create_latex_table(scores, all_results, other_methods, "hubs", 120, 100)
 
-# Table 1.
 create_latex_table(scores, all_results, random_methods, "random", 120, 200)
 create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 200)
 create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 200)
 create_latex_table(scores, all_results, other_methods, "hubs", 120, 200)
 
 #######
-# Next lines are all for Supplementary Materials.
+# Next lines are all for Supporting information.
 
 ######
-# Create full LaTeX tables for supplementary material.
+# Create full LaTeX tables for Supporting information.
 # Define scores.
 scores <- c("MCC", "TPR", "FPR", "FDR", "f_norm_rel", "sl_omega", "time")
 
 # Print LaTeX tabels. First, p = 100.
-# Supplementary Table S4.
+# Supporting information table D.
 create_latex_table(scores, all_results, random_methods, "random", 120, 100)
 create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 100)
 create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 100)
 create_latex_table(scores, all_results, other_methods, "hubs", 120, 100)
 
 # Next, p = 200
-# Supplementary Table S5.
+# Supporting information table E.
 create_latex_table(scores, all_results, random_methods, "random", 120, 200)
 create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 200)
 create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 200)
@@ -119,7 +121,7 @@ create_latex_table(scores, all_results, other_methods, "hubs", 120, 200)
 
 #######
 # GHS LLA runtimes and proportion of the tau's tuning times.
-# Supplementary Table S3.
+# Supporting information table C.
 for (n in sample_sizes) {
   for (p in variable_numbers) {
     cat("n: ", n, ", p: ", p, "\n", sep = "")
@@ -133,59 +135,10 @@ for (n in sample_sizes) {
 }
 
 ######
-# Create LaTeX table of mean number of false positives for supplementary material.
-# Supplementary Table S6.
+# Create LaTeX table of mean number of false positives for Supporting information.
+# Supporting information table F.
 create_false_positives_table(all_results, random_methods, structures, sample_sizes, variable_numbers)
 
-
-# Results of the fastGHS method with p = 100.
-# Initialize paramaters.
-sample_sizes <- c(120)
-variable_numbers <- c(100)
-R_methods <- c("GHSGEM", "fastGHS")
-MATLAB_methods <- c("GHS_MCMC")
-structures <- c("random", "bdgraph_sf", "huge_sf", "hubs")
-
-# Read results from the files.
-fastGHS_results_p100 <- list()
-fastGHS_results_p100 <- add_R_results(fastGHS_results_p100, R_methods, structures, sample_sizes,
-                                      variable_numbers)
-fastGHS_results_p100 <- add_MATLAB_results(fastGHS_results_p100, MATLAB_methods, structures,
-                                           sample_sizes, variable_numbers)
-
-# Set method names.
-random_methods <- c("GHSGEM", "GHSGEM_p/2", "GHS_MCMC", "fastGHS")
-other_methods <- c("GHSGEM", "GHS_MCMC", "fastGHS")
-
-# Set scores.
-scores <- c("MCC", "TPR", "FPR", "FDR", "f_norm_rel", "sl_omega", "time")
-
-# Print results.
-print_results(scores, fastGHS_results_p100, random_methods, "random", 120, 100)
-print_results(scores, fastGHS_results_p100, other_methods, "bdgraph_sf", 120, 100)
-print_results(scores, fastGHS_results_p100, other_methods, "huge_sf", 120, 100)
-print_results(scores, fastGHS_results_p100, other_methods, "hubs", 120, 100)
-
-# Results of the fastGHS method with p = 200 and network structure is random.
-# Read results from the files.
-fastGHS_results_p200 <- list()
-fastGHS_results_p200 <- add_R_results(fastGHS_results_p200, R_methods, "random", 120, 200)
-fastGHS_results_p200 <- add_MATLAB_results(fastGHS_results_p200, MATLAB_methods, "random", 120, 200)
-
-# Print results.
-print_results(scores, fastGHS_results_p200, random_methods, "random", 120, 200)
-
-# Create LaTeX tables.
-# Supplementary Table S7.
-create_latex_table(scores, fastGHS_results_p100, random_methods, "random", 120, 100)
-create_latex_table(scores, fastGHS_results_p100, other_methods, "bdgraph_sf", 120, 100)
-create_latex_table(scores, fastGHS_results_p100, other_methods, "huge_sf", 120, 100)
-create_latex_table(scores, fastGHS_results_p100, other_methods, "hubs", 120, 100)
-
-# Supplementary Table S8.
-create_latex_table(scores, fastGHS_results_p200, random_methods, "random", 120, 200)
-
-
 ######
-# Create runtime table. Not presented in the paper or Supplementary Material.
+# Create runtime table. Not presented in the paper or Supporting information.
 create_runtime_table(all_results, other_methods, structures, sample_sizes, variable_numbers)
