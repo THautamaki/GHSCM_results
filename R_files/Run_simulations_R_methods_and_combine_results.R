@@ -89,7 +89,7 @@ print_results(scores, all_results, other_methods, "hubs", 120, 200)
 # Define scores for LaTeX tables in main paper.
 scores <- c("MCC", "TPR", "FDR", "sl_omega")
 
-# Print LaTeX tabels (Table 1 in paper).
+# Print body of LaTeX tabels (Table 1 in paper).
 create_latex_table(scores, all_results, random_methods, "random", 120, 100)
 create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 100)
 create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 100)
@@ -108,7 +108,7 @@ create_latex_table(scores, all_results, other_methods, "hubs", 120, 200)
 # Define scores.
 scores <- c("MCC", "TPR", "FPR", "FDR", "f_norm_rel", "sl_omega", "time")
 
-# Print LaTeX tabels. First, p = 100.
+# Print bodies of LaTeX tabels. First, p = 100.
 # Supporting Information table D.
 create_latex_table(scores, all_results, random_methods, "random", 120, 100)
 create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 100)
