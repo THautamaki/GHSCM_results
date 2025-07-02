@@ -1,13 +1,12 @@
 
-# Results of the article: Gene co-expression network estimation using GEM with GHS prior
+# Results of the article: GHSCM: Efficient MAP inference for biological networks with the GHS prior
 
 This repository contains all codes and results files used to produce the
-results for the article *Gene co-expression network estimation using
-generalized expectation-maximization algorithm with graphical horseshoe
-prior*.
+results for the article *GHSCM: Efficient maximum a posteriori inference
+for biological networks with the graphical horseshoe prior*.
 
-We implemented our method in the R package called GHSGEM, which is
-available on GitHub at <https://github.com/THautamaki/GHSGEM>.
+We implemented our method in the R package called GHSCM, which is
+available on GitHub at <https://github.com/THautamaki/GHSCM>.
 
 ## Original MATLAB codes
 
@@ -66,8 +65,7 @@ follows:
 
 ## Performing the simulation analyses
 
-> [!IMPORTANT]
-> All provided scripts assume the working directory has
+> \[!IMPORTANT\] All provided scripts assume the working directory has
 > the same directory structure as this repository. The scripts use
 > relative paths to read and save files.
 
@@ -92,10 +90,9 @@ run-to-run variance as we do not use fixed seeds for every MATLAB method
 (and StARS for GLASSO). The biggest difference in MCC we saw was about
 0.012.
 
-> [!CAUTION]
-> Please note that if a similar system is used, as
+> \[!CAUTION\] Please note that if a similar system is used, as
 > described in the article (a 16-core AMD Ryzen 9 7950X3D processor and
-> 64 GB of RAM), all simulations require approximately 3.5 days to
+> 64 GB of RAM), all simulations require approximately 4.5 days to
 > complete.
 
 ## Performing the real-world dataset analyses
@@ -107,7 +104,7 @@ We suggest creating transformed datasets first by running lines 7–32
 from the R script `Analysis_of_CEU_dataset.R`. Then, MATLAB methods can
 be run from the script `Run_CEU_dataset_MATLAB_methods.m` using MATLAB’s
 `Run all sections` shortcut. Finally, the remaining lines from the R
-script can be executed. It performs the GHS GEM method, calculates the
+script can be executed. It performs the GHS CM method, calculates the
 numbers used in the article, and plots the estimated networks.
 
 ### The DLBC dataset
@@ -117,46 +114,39 @@ We suggest creating transformed datasets first by running lines 8–32
 from the R script `Analysis_of_DLBC_dataset.R`. Then, MATLAB methods can
 be run from the script `Run_DLBC_dataset_MATLAB_methods.m` using
 MATLAB’s `Run all sections` shortcut. Finally, the remaining lines from
-the R script can be executed. It performs the GHS GEM method, calculates
+the R script can be executed. It performs the GHS CM method, calculates
 the numbers used in the article, and plots the estimated networks.
 
-## Supplementary materials
+## Supporting Information
 
 ### Analysis of the kappa threshold
 
-Supplementary Figures S1, S2, and S3 can be created using the R script
-`Analysis_of_kappa_threshold.R`.
+Supporting information Figures A, B, and C can be created using the R
+script `Analysis_of_kappa_threshold.R`.
 
-### Analysis of the initial values of the GHS GEM algorithm
+### Analysis of the initial values of the GHS CM algorithm
 
-Analysis of the initial values of the GHS GEM algorithm, as presented in
+Analysis of the initial values of the GHS CM algorithm, as presented in
 the supplementary material, can be performed using the R script
-`Analysis_of_initial_values.R` (Supplementary Table S1 and S2). Please
-note that the analysis requires about 3.5 hours to complete, assuming a
-system with similar specifications is used, as described above.
+`Analysis_of_initial_values.R` (Supporting information Table A and B).
+Please note that the analysis requires about 3.5 hours to complete,
+assuming a system with similar specifications is used, as described
+above.
 
 ### Parameter c in the global scale parameter formula
 
-Supplementary Figure S4 can be created using the R script
+Supporting information Figure D can be created using the R script
 `Analysis_of_c_parameter.R`. Please note that the analysis requires
 approximately 5 hours to complete, assuming a system with similar
 specifications is used, as described above.
 
-### Details of the simulated datasets
-
-Supplementary Figures S5 and S6 can be created using the R script
-`Plot_simulated_structures.R`.
-
 ### Complete results of the simulations
 
-Supplementary Tables S3–S6 can be created using the main R script
+Supporting information Tables C–F can be created using the main R script
 `Run_simulations_R_methods_and_combine_results.R` (lines 104–138).
 
-### Results with the fastGHS method
+### Additional analysis with the fastGHS method
 
-We did not include the fastGHS method results in the main article, but
-they can be reproduced using the same R script used for the main results
-(`Run_R_methods_and_combine_results.R`, lines from 143 forward). The
-script contains code to create Supplementary Tables S7 and S8. We also
-did some additional analysis, which can be reproduced using the R script
-`Additional_fastGHS_analysis.R` (Supplementary Figures S7 and S8).
+We did additional analysis, which can be reproduced using the R script
+`Additional_fastGHS_analysis.R` (Supporting information Figures G and
+H).
