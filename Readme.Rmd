@@ -36,7 +36,7 @@ The files in the repository are organized in the main directories as follows:
 -   Data
     -   This directory is not stored in GitHub as simulated datasets can be generated anytime, and real-world datasets are available publicly on the Internet. The R code creates this when simulated datasets are generated. Please store the real-world datasets in the directories named `CEU_dataset` and `DLBC_dataset`.
 -   Figures
-    -   Contains all figures generated for the main article and supplementary material in own directories.
+    -   Contains all figures generated for the main article and Supporting Information in own directories.
 -   MATLAB_files
     -   The root contains some helper functions.
     -   Each method has its directories where associated codes are.
@@ -62,6 +62,10 @@ Each MATLAB method has `<method_name>_analysis.m` file to run simulations. They 
 >[!CAUTION]
 >Please note that if a similar system is used, as described in the article (a 16-core AMD Ryzen 9 7950X3D processor and 64 GB of RAM), all simulations require approximately 4.5 days to complete.
 
+### Closer comparison with GHS MCMC
+
+To run closer comparison with the GHS MCMC method, we created R script named `Compare_GHSCM_and_GHS_MCMC_estimates.R`. It runs GHS CM estimation as we do not save the precision or adjacency matrices in the simulation studies, and then compares estimates with the GHS MCMC method (matrices are saved earlier).
+
 ## Performing the real-world dataset analyses
 
 ### The CEU dataset
@@ -76,20 +80,20 @@ We created R and MATLAB scripts to perform analyses of the DLBC dataset. We sugg
 
 ### Analysis of the kappa threshold
 
-Supporting information Figures A, B, and C can be created using the R script `Analysis_of_kappa_threshold.R`.
+Supporting Information Figures A, B, and C can be created using the R script `Analysis_of_kappa_threshold.R`.
 
 ### Analysis of the initial values of the GHS CM algorithm
 
-Analysis of the initial values of the GHS CM algorithm, as presented in the supplementary material, can be performed using the R script `Analysis_of_initial_values.R` (Supporting information Table A and B). Please note that the analysis requires about 3.5 hours to complete, assuming a system with similar specifications is used, as described above.
+Analysis of the initial values of the GHS CM algorithm, as presented in the Supporting Information, can be performed using the R script `Analysis_of_initial_values.R` (Supporting Information Tables A and B). Please note that the analysis requires about 3.5 hours to complete, assuming a system with similar specifications is used, as described above.
 
 ### Parameter c in the global scale parameter formula
 
-Supporting information Figure D can be created using the R script `Analysis_of_c_parameter.R`. Please note that the analysis requires approximately 5 hours to complete, assuming a system with similar specifications is used, as described above.
+Supporting Information Figure D can be created using the R script `Analysis_of_c_parameter.R`. Please note that the analysis requires approximately 5 hours to complete, assuming a system with similar specifications is used, as described above.
 
 ### Complete results of the simulations
 
-Supporting information Tables C--F can be created using the main R script `Run_simulations_R_methods_and_combine_results.R` (lines 104--138).
+Supporting Information Tables C--F can be created using the main R script `Run_simulations_R_methods_and_combine_results.R` (lines 104--138).
 
 ### Additional analysis with the fastGHS method
 
-We did additional analysis, which can be reproduced using the R script `Additional_fastGHS_analysis.R` (Supporting information Figures G and H).
+We did additional analysis, which can be reproduced using the R script `Additional_fastGHS_analysis.R` (Supporting Information Figures E and F).

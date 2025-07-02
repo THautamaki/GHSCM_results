@@ -1,4 +1,4 @@
-library(GHSGEM)
+library(GHSCM)
 library(doParallel)
 
 # Function which generates random positive-definite matrix.
@@ -42,7 +42,7 @@ if (!file.exists(hub_p100_resultsfile)) {
   cl <- makeCluster(detectCores(logical = FALSE))
   registerDoParallel(cl)
   (start <- Sys.time())
-  hub_Thetas_p100 <- foreach (data_nro = 1:n_datasets, .packages = "GHSGEM") %dopar% {
+  hub_Thetas_p100 <- foreach (data_nro = 1:n_datasets, .packages = "GHSCM") %dopar% {
     theta <- matrix(0, p, p)
     for (i in 1:n_inits) {
       map <- GHS_MAP_estimation(sim_hubs[[data_nro]]$data, use_Cpp = FALSE,
@@ -118,7 +118,7 @@ if (!file.exists(huge_sf_p200_resultsfile)) {
   cl <- makeCluster(detectCores(logical = FALSE))
   registerDoParallel(cl)
   (start <- Sys.time())
-  huge_sf_Thetas_p200 <- foreach (data_nro = 1:n_datasets, .packages = "GHSGEM") %dopar% {
+  huge_sf_Thetas_p200 <- foreach (data_nro = 1:n_datasets, .packages = "GHSCM") %dopar% {
     theta <- matrix(0, p, p)
     for (i in 1:n_inits) {
       map <- GHS_MAP_estimation(sim_huge_sf[[data_nro]]$data, use_Cpp = FALSE,
@@ -194,7 +194,7 @@ if (!file.exists(bdgraph_sf_p100_resultsfile)) {
   cl <- makeCluster(detectCores(logical = FALSE)-1)
   registerDoParallel(cl)
   print(start <- Sys.time())
-  BDgraph_sf_Thetas_p100 <- foreach (data_nro = 1:n_datasets, .packages = "GHSGEM") %dopar% {
+  BDgraph_sf_Thetas_p100 <- foreach (data_nro = 1:n_datasets, .packages = "GHSCM") %dopar% {
     theta <- matrix(0, p, p)
     for (i in 1:n_inits) {
       map <- GHS_MAP_estimation(sim_bdgraph_sf[[data_nro]]$data, use_Cpp = FALSE,

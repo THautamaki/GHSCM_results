@@ -1,4 +1,4 @@
-library(GHSGEM)
+library(GHSCM)
 library(huge)
 library(doParallel)
 
@@ -14,7 +14,7 @@ if(!file.exists("Results_files/Parameter_c/Results_with_fdr_control.Rds")) {
   registerDoParallel(cl)
   (start <- Sys.time())
   results_with_fdr_control <- foreach (r = 1:n_repeats, .combine = "rbind",
-                                       .packages = c("GHSGEM", "huge"), .verbose = TRUE) %dopar% {
+                                       .packages = c("GHSCM", "huge"), .verbose = TRUE) %dopar% {
     scores <- data.frame()
     for (i in 1:length(p)) {
       n1 <- n[i]
@@ -100,7 +100,7 @@ if(!file.exists("Results_files/Parameter_c/Results_with_defaults.Rds")) {
   registerDoParallel(cl)
   (start <- Sys.time())
   results_with_defaults <- foreach (r = 1:n_repeats, .combine = "rbind",
-                                    .packages = c("GHSGEM", "huge"), .verbose = TRUE) %dopar% {
+                                    .packages = c("GHSCM", "huge"), .verbose = TRUE) %dopar% {
     scores <- data.frame()
     for (i in 1:length(p)) {
       n1 <- n[i]
@@ -150,7 +150,7 @@ data.frame(p = agg_results$p1, denominator = agg_results$p1 / agg_results$c, c_o
            c = agg_results$c, difference = agg_results$c - agg_results$p1/5)
 
 # Plot key performance scores.
-pdf("Figures/Supplementary/c_parameter_scores.pdf", width = 7, height = 9)
+pdf("Figures/Supporting_information/c_parameter_scores.pdf", width = 7, height = 9)
 par(mfrow = c(3,2))
 par(mgp = c(2, 1, 0))
 par(mar = c(3.1, 3.1, 0.2, 0.2))

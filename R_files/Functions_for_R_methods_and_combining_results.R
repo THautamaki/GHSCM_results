@@ -1,4 +1,4 @@
-run_analysis <- function(structure, n, p, method = "GHSGEM", p0 = 0, save_results = TRUE) {
+run_analysis <- function(structure, n, p, method = "GHSCM", p0 = 0, save_results = TRUE) {
   # Load datasets from file.
   path <- paste0("Data/n", n, "_p", p, "/")
   if (tolower(structure) == "random") {
@@ -18,23 +18,23 @@ run_analysis <- function(structure, n, p, method = "GHSGEM", p0 = 0, save_result
   }
   n_datasets <- length(simulations)
   cores <- detectCores(logical = FALSE)
-  if (tolower(method) == "ghsgem") {
-    packages <- c("GHSGEM")
+  if (tolower(method) == "ghscm") {
+    packages <- c("GHSCM")
   }
   else if (tolower(method) == "glasso") {
-    packages <- c("huge", "GHSGEM")
+    packages <- c("huge", "GHSCM")
   }
   else if (tolower(method) == "beam") {
-    packages <- c("beam", "GHSGEM")
+    packages <- c("beam", "GHSCM")
   }
   else if (tolower(method) == "pulsar") {
-    packages <- c("pulsar", "huge", "GHSGEM")
+    packages <- c("pulsar", "huge", "GHSCM")
   }
   else if (tolower(method) == "fastghs") {
-    packages <- c("fastGHS", "GHSGEM")
+    packages <- c("fastGHS", "GHSCM")
   }
   else {
-    stop("Wrong method! Possible choices are 'GHSGEM', 'GLASSO', 'pulsar', 'beam', and 'fastGHS'.")
+    stop("Wrong method! Possible choices are 'GHSCM', 'GLASSO', 'pulsar', 'beam', and 'fastGHS'.")
   }
   cl <- makeCluster(cores)
   registerDoParallel(cl)
@@ -42,7 +42,7 @@ run_analysis <- function(structure, n, p, method = "GHSGEM", p0 = 0, save_result
   results <- foreach (i = 1:n_datasets, .combine = "rbind", .packages = packages,
                       .verbose = FALSE) %dopar% {
     sim <- simulations[[i]]
-    if (tolower(method) == "ghsgem") {
+    if (tolower(method) == "ghscm") {
       map <- GHS_MAP_estimation(sim$data, verbose = 0, p0 = p0, max_iterations = 1000, tol = 1e-4)
       theta_est <- map$Theta
       sigma_est <- map$Sigma_est
@@ -97,7 +97,7 @@ run_analysis <- function(structure, n, p, method = "GHSGEM", p0 = 0, save_result
     f_norm_sigma <- NA
     f_norm_omega <- NA
     f_norm_rel <- NA
-    if (tolower(method) == "ghsgem" | tolower(method) == "fastghs") {
+    if (tolower(method) == "ghscm" | tolower(method) == "fastghs") {
       sl_omega <- stein_loss(sim$omega, omega_est)
       sl_sigma <- stein_loss(sim$sigma, sigma_est)
       f_norm_omega <- norm(sim$omega - omega_est, type = "f")
@@ -119,7 +119,7 @@ run_analysis <- function(structure, n, p, method = "GHSGEM", p0 = 0, save_result
   results <- list(results = results, total_time = total_time)
   if (save_results) {
     results_path <- paste0("Results_files/p", p, "/", method, "/")
-    if (tolower(method) == "ghsgem" & tolower(structure) == "random" & p0 > 0) {
+    if (tolower(method) == "ghscm" & tolower(structure) == "random" & p0 > 0) {
       saveRDS(results, file = paste0(results_path, structure, "_p", p, "_", method, "_results_2.Rds"))
     }
     else {
@@ -136,7 +136,7 @@ run_multiple_methods <- function(methods, structures, sample_sizes, variable_num
       for (n in sample_sizes) {
         for (p in variable_numbers) {
           all_results[[method]][[structure]][[paste0("n", n, "_p", p)]] <- run_analysis(structure, n, p, method, save_results = save_results)
-          if (method == "GHSGEM" & structure == "random") {
+          if (method == "GHSCM" & structure == "random") {
             all_results[[paste0(method, "_p/2")]][[structure]][[paste0("n", n, "_p", p)]] <- run_analysis(structure, n, p, method, p0 = p/2, save_results = save_results)
           }
         }
@@ -152,12 +152,11 @@ add_R_results <- function(results_list, methods, structures, sample_sizes, varia
       for (n in sample_sizes) {
         for (p in variable_numbers) {
           path <- paste0("Results_files/p",p, "/", method, "/")
-          if (tolower(method) == "ghsgem" & tolower(structure) == "random") {
+          if (tolower(method) == "ghscm" & tolower(structure) == "random") {
             results <- readRDS(paste0(path, structure, "_p", p, "_", method, "_results_2.Rds"))
             results_list[[paste0(method, "_p/2")]][[structure]][[paste0("n", n, "_p", p)]]$results <- results$results
             results_list[[paste0(method, "_p/2")]][[structure]][[paste0("n", n, "_p", p)]]$total_time <- as.double(results$total_time, units = "secs")
           }
-          path <- paste0("Results_files/p",p, "/", method, "/")
           results <- readRDS(paste0(path, structure, "_p", p, "_", method, "_results.Rds"))
           results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$results <- results$results
           results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$total_time <- as.double(results$total_time, units = "secs")
@@ -226,10 +225,10 @@ create_latex_table <- function(scores, results_list, methods, structure, n, p, h
   df_means <- means_and_sds$means
   df_sds <- means_and_sds$sds
   for (method in methods) {
-    if (method == "GHSGEM") {
+    if (method == "GHSCM") {
       cat(format("GHS CM, $p_0=p-1$", width = 19), sep = "")
     }
-    else if (method == "GHSGEM_p/2") {
+    else if (method == "GHSCM_p/2") {
       cat(format("GHS CM, $p_0=p/2$", width = 19), sep = "")
     }
     else if (method == "GHS_MCMC") {
@@ -246,6 +245,9 @@ create_latex_table <- function(scores, results_list, methods, structure, n, p, h
     }
     else if (method == "GLASSO") {
       cat(format("GLASSO (StARS)", width = 19), sep = "")
+    }
+    else if (method == "fastGHS") {
+      cat(format("GHS ECM", width = 19), sep = "")
     }
     else {
       cat(format(method, width = 19), sep = "")
@@ -361,10 +363,10 @@ calculate_runtimes <- function(all_results, methods, structures, sample_sizes, v
 create_runtime_table <- function(all_results, methods, structures, sample_sizes, variable_numbers) {
   runtimes <- calculate_runtimes(all_results, methods, structures, sample_sizes, variable_numbers)
   for (method in methods) {
-    if (method == "GHSGEM") {
+    if (method == "GHSCM") {
       cat(format("GHS CM, $p_0=p-1$", width = 19), sep = "")
     }
-    else if (method == "GHSGEM_p/2") {
+    else if (method == "GHSCM_p/2") {
       cat(format("GHS CM, $p_0=p/2$", width = 19), sep = "")
     }
     else if (method == "GHS_MCMC") {
@@ -381,6 +383,9 @@ create_runtime_table <- function(all_results, methods, structures, sample_sizes,
     }
     else if (method == "GLASSO") {
       cat(format("GLASSO (StARS)", width = 19), sep = "")
+    }
+    else if (method == "fastGHS") {
+      cat(format("GHS ECM", width = 19), sep = "")
     }
     else {
       cat(format(method, width = 19), sep = "")
@@ -423,10 +428,10 @@ calculate_false_positives <- function(all_results, methods, structures, sample_s
 create_false_positives_table <- function(all_results, methods, structures, sample_sizes, variable_numbers) {
   false_positives <- calculate_false_positives(all_results, methods, structures, sample_sizes, variable_numbers)
   for (method in methods) {
-    if (method == "GHSGEM") {
+    if (method == "GHSCM") {
       cat(format("GHS CM, $p_0=p-1$", width = 19), sep = "")
     }
-    else if (method == "GHSGEM_p/2") {
+    else if (method == "GHSCM_p/2") {
       cat(format("GHS CM, $p_0=p/2$", width = 19), sep = "")
     }
     else if (method == "GHS_MCMC") {
@@ -443,6 +448,9 @@ create_false_positives_table <- function(all_results, methods, structures, sampl
     }
     else if (method == "GLASSO") {
       cat(format("GLASSO (StARS)", width = 19), sep = "")
+    }
+    else if (method == "fastGHS") {
+      cat(format("GHS ECM", width = 19), sep = "")
     }
     else {
       cat(format(method, width = 19), sep = "")

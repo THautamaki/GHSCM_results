@@ -1,4 +1,4 @@
-library(GHSGEM)
+library(GHSCM)
 library(fastGHS)
 library(huge)
 library(doParallel)
@@ -17,10 +17,10 @@ if(!file.exists("Results_files/fastGSH_vs_GHSCM_n70-n1500_p150.Rds")) {
   set.seed(20250313)
   # Generate network structure.
   sim <- huge.generator(n = 50, d = p , graph = "scale-free")
-  # Run both fastGHS and GHSGEM over sample sizes and replications using parallel computing.
+  # Run both fastGHS and GHS CM over sample sizes and replications using parallel computing.
   cl <- makeCluster(detectCores(logical = FALSE))
   registerDoParallel(cl)
-  results <- foreach(i = 1:length(sample_sizes), .combine = "rbind", .packages = c("GHSGEM", "fastGHS", "huge")) %dopar% {
+  results <- foreach(i = 1:length(sample_sizes), .combine = "rbind", .packages = c("GHSCM", "fastGHS", "huge")) %dopar% {
     scores <- data.frame()
     for (r in 1:n_datasets) {
       n <- sample_sizes[i]
@@ -39,10 +39,10 @@ if(!file.exists("Results_files/fastGSH_vs_GHSCM_n70-n1500_p150.Rds")) {
       f_norm_rel <- norm(sim$omega - omega_est, type = "f") / norm(sim$omega, type = "f")
       sl_omega <- stein_loss(sim$omega, omega_est)
       scores <- rbind(scores, cbind(score, f_norm_rel, sl_omega, edge_count, n, r, method))
-      # Results using GHS GEM.
+      # Results using GHS CM.
       map <- GHS_MAP_estimation(data, verbose = 0, max_iterations = 1000, tol = 1e-4)
       theta_est <- map$Theta_est
-      method <- "GHSGEM"
+      method <- "GHSCM"
       edge_count <- sum(theta_est) / 2
       omega_est <- result$theta
       score <- calculate_scores(conf_matrix(sim$theta, theta_est))
@@ -64,17 +64,17 @@ if (file.exists("Results_files/fastGSH_vs_GHSCM_n70-n1500_p150.Rds")) {
   results <- readRDS("Results_files/fastGSH_vs_GHSCM_n70-n1500_p150.Rds")
 }
 
-# Separate fastGHS and GHS GEM results into own data frames.
+# Separate fastGHS and GHS CM results into own data frames.
 fastGHS_results <- results[results$method == "fastGHS", ]
-GHSCM_results <- results[results$method == "GHSGEM", ]
+GHSCM_results <- results[results$method == "GHSCM", ]
 
 # Calculate mean over the dataset replicas.
 fastGHS_agg_results <- aggregate(fastGHS_results[, 1:22], by = list(fastGHS_results$n), FUN = mean)
-GHSCM_agg_results <- aggregate(GHSGEM_results[, 1:22], by = list(GHSGEM_results$n), FUN = mean)
+GHSCM_agg_results <- aggregate(GHSCM_results[, 1:22], by = list(GHSCM_results$n), FUN = mean)
 
 # Create figures.
 # Number of connections.
-pdf("Figures/Supplementary/fastGHS_and_GHSCM_n70-1500_connection_numbers.pdf", width = 10, height = 5)
+pdf("Figures/Supporting_information/fastGHS_and_GHSCM_n70-1500_connection_numbers.pdf", width = 10, height = 5)
 par(mfrow = c(1,2))
 par(mgp = c(2, 1, 0))
 par(mar = c(3.1, 3.1, 0.2, 0.2))
@@ -100,7 +100,7 @@ grid()
 dev.off()
 
 # MCCs and F1-scores.
-pdf("Figures/Supplementary/fastGHS_and_GHSCM_n70-1500_MCC_and_F1.pdf", width = 10, height = 5)
+pdf("Figures/Supporting_information/fastGHS_and_GHSCM_n70-1500_MCC_and_F1.pdf", width = 10, height = 5)
 par(mfrow = c(1,2))
 par(mgp = c(2, 1, 0))
 par(mar = c(3.1, 3.1, 0.2, 0.2))

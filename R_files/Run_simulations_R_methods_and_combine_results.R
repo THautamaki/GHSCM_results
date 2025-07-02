@@ -5,8 +5,8 @@ if(!require("BDgraph", quietly = TRUE)) {
 if(!require("huge", quietly = TRUE)) {
   install.packages("huge")
 }
-if(!require("GHSGEM", quietly = TRUE)) {
-  devtools::install_github("THautamaki/GHSGEM")
+if(!require("GHSCM", quietly = TRUE)) {
+  devtools::install_github("THautamaki/GHSCM")
 }
 if(!require("beam", quietly = TRUE)) {
   devtools::install_version("beam", version = "2.0.2")
@@ -28,7 +28,7 @@ if(!require("R.matlab", quietly = TRUE)) {
 }
 
 # Load packages.
-library(GHSGEM)
+library(GHSCM)
 library(beam)
 library(huge)
 library(fastGHS)
@@ -49,12 +49,15 @@ if (!data_generated) {
 sample_sizes <- c(120)
 variable_numbers <- c(100, 200)
 structures <- c("random", "bdgraph_sf", "huge_sf", "hubs")
-R_methods <- c("GHSGEM", "GLASSO", "fastGHS")
+R_methods <- c("GHSCM", "GLASSO", "fastGHS")
 MATLAB_methods <- c("GHS_MCMC", "GHS_LLA", "HSL_MCMC", "HSL_ECM")
 
 # Run all R methods if not yet run.
-all_results <- run_multiple_methods(R_methods, structures, sample_sizes, variable_numbers,
-                                    save_results = TRUE)
+simulations_done <- TRUE
+if (!simulations_done) {
+  all_results <- run_multiple_methods(R_methods, structures, sample_sizes, variable_numbers,
+                                      save_results = TRUE)
+}
 
 # Combine results into one object.
 # If results using R methods exist and saved, create empty list first.
@@ -64,10 +67,10 @@ all_results <- add_R_results(all_results, R_methods, structures, sample_sizes, v
 all_results <- add_MATLAB_results(all_results, MATLAB_methods,
                                   structures, sample_sizes, variable_numbers)
 
-# Define the methods and which order they will be printed. GHS GEM has two results for random network
+# Define the methods and which order they will be printed. GHS CM has two results for random network
 # structure.
-random_methods <- c("GHSGEM_p/2", "GHSGEM", "GHS_MCMC", "fastGHS", "GHS_LLA", "HSL_MCMC", "HSL_ECM", "GLASSO")
-other_methods <- c("GHSGEM", "GHS_MCMC", "fastGHS", "GHS_LLA", "HSL_MCMC", "HSL_ECM", "GLASSO")
+random_methods <- c("GHSCM_p/2", "GHSCM", "GHS_MCMC", "fastGHS", "GHS_LLA", "HSL_MCMC", "HSL_ECM", "GLASSO")
+other_methods <- c("GHSCM", "GHS_MCMC", "fastGHS", "GHS_LLA", "HSL_MCMC", "HSL_ECM", "GLASSO")
 
 # Define scores which results will be printed.
 scores <- c("MCC", "TPR", "FPR", "FDR", "f_norm_rel", "sl_omega", "time")
@@ -106,14 +109,14 @@ create_latex_table(scores, all_results, other_methods, "hubs", 120, 200)
 scores <- c("MCC", "TPR", "FPR", "FDR", "f_norm_rel", "sl_omega", "time")
 
 # Print LaTeX tabels. First, p = 100.
-# Supporting information table D.
+# Supporting Information table D.
 create_latex_table(scores, all_results, random_methods, "random", 120, 100)
 create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 100)
 create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 100)
 create_latex_table(scores, all_results, other_methods, "hubs", 120, 100)
 
 # Next, p = 200
-# Supporting information table E.
+# Supporting Information table E.
 create_latex_table(scores, all_results, random_methods, "random", 120, 200)
 create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 200)
 create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 200)
@@ -135,10 +138,10 @@ for (n in sample_sizes) {
 }
 
 ######
-# Create LaTeX table of mean number of false positives for Supporting information.
-# Supporting information table F.
+# Create LaTeX table of mean number of false positives for Supporting Information.
+# Supporting Information table F.
 create_false_positives_table(all_results, random_methods, structures, sample_sizes, variable_numbers)
 
 ######
-# Create runtime table. Not presented in the paper or Supporting information.
+# Create runtime table. Not presented in the paper or Supporting Information.
 create_runtime_table(all_results, other_methods, structures, sample_sizes, variable_numbers)
