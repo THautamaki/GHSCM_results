@@ -84,7 +84,7 @@ conf_matrix(GHSCM_MAP$Theta, GHS_MCMC_Theta)
 # Set names for the nodes.
 names(GHS_CM_degrees) <- names(GHS_MCMC_degrees) <- 1:p
 
-# Calculate how many nodes with the highest degree are the same
+# Check which nodes with the highest degree are the same
 same_nodes <- c()
 for (n1 in names(GHS_CM_degrees[order(GHS_CM_degrees, decreasing = TRUE)][1:10])) {
   for (n2 in names(GHS_MCMC_degrees[order(GHS_MCMC_degrees, decreasing = TRUE)][1:10])) {
@@ -93,7 +93,9 @@ for (n1 in names(GHS_CM_degrees[order(GHS_CM_degrees, decreasing = TRUE)][1:10])
     }
   }
 }
+# Print node numbers and corresponding gene names
 same_nodes
+colnames(data_npn)[as.numeric(same_nodes)]
 
 # Highest degrees
 GHS_CM_degrees[order(GHS_CM_degrees, decreasing = TRUE)][1:10]
@@ -103,14 +105,14 @@ GHSl_ECM_degrees[order(GHSl_ECM_degrees, decreasing = TRUE)][1:10]
 
 ######
 # Calculate coordinates for the nodes
-set.seed(8)
+set.seed(6)
 ceu_coords <- igraph::layout_with_fr(igraph::graph_from_adjacency_matrix(GHSCM_MAP$Theta,
                                                                          mode = "undirected",
                                                                          diag = FALSE))
 
 # Plot network estimates
 setEPS()
-postscript("Figures/Main_article/CEU_network_estimates.eps", width = 20, height = 5)
+postscript("Figures/Main_article/CEU_network_estimates_2.eps", width = 20, height = 5)
 par(mfrow = c(1,4))
 plot_network(GHSCM_MAP$Theta, layout = ceu_coords, node_size = GHS_CM_degrees*1.5,
              node_labels = NA, margins = c(0,0,0,0))
