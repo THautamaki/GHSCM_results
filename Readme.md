@@ -1,9 +1,9 @@
 
-# Results of the article: GHSCM: Efficient MAP inference for biological networks with the GHS prior
+# Results of the article: GHSCM: Efficient MAP inference for gene co-expression networks with the GHS prior
 
 This repository contains all codes and results files used to produce the
 results for the article *GHSCM: Efficient maximum a posteriori inference
-for biological networks with the graphical horseshoe prior*.
+for gene co-expression networks with the graphical horseshoe prior*.
 
 We implemented our method in the R package called GHSCM, which is
 available on GitHub at <https://github.com/THautamaki/GHSCM>.
@@ -65,8 +65,7 @@ follows:
 
 ## Performing the simulation analyses
 
-> [!IMPORTANT]
-> All provided scripts assume the working directory has
+> [!IMPORTANT] All provided scripts assume the working directory has
 > the same directory structure as this repository. The scripts use
 > relative paths to read and save files.
 
@@ -91,8 +90,7 @@ run-to-run variance as we do not use fixed seeds for every MATLAB method
 (and StARS for GLASSO). The biggest difference in MCC we saw was about
 0.012.
 
-> [!CAUTION]
-> Please note that if a similar system is used, as
+> [!CAUTION] Please note that if a similar system is used, as
 > described in the article (a 16-core AMD Ryzen 9 7950X3D processor and
 > 64 GB of RAM), all simulations require approximately 4.5 days to
 > complete.

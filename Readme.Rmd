@@ -6,9 +6,9 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE, fig.path = "man/figures/README-", out.width = "100%")
 ```
 
-# Results of the article: GHSCM: Efficient MAP inference for biological networks with the GHS prior
+# Results of the article: GHSCM: Efficient MAP inference for gene co-expression networks with the GHS prior
 
-This repository contains all codes and results files used to produce the results for the article *GHSCM: Efficient maximum a posteriori inference for biological networks with the graphical horseshoe prior*.
+This repository contains all codes and results files used to produce the results for the article *GHSCM: Efficient maximum a posteriori inference for gene co-expression networks with the graphical horseshoe prior*.
 
 We implemented our method in the R package called GHSCM, which is available on GitHub at <https://github.com/THautamaki/GHSCM>.
 
