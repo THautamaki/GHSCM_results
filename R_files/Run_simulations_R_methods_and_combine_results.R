@@ -73,7 +73,7 @@ random_methods <- c("GHSCM_p/2", "GHSCM", "GHS_MCMC", "fastGHS", "GHS_LLA", "HSL
 other_methods <- c("GHSCM", "GHS_MCMC", "fastGHS", "GHS_LLA", "HSL_MCMC", "HSL_ECM", "GLASSO")
 
 # Define scores which results will be printed.
-scores <- c("MCC", "TPR", "FPR", "FDR", "f_norm_rel", "sl_omega", "time")
+scores <- c("MCC", "TPR", "FPR", "FDR", "f_norm_rel", "sl_omega", "time", "total_time")
 
 # Print results.
 print_results(scores, all_results, random_methods, "random", 120, 100)
@@ -86,10 +86,12 @@ print_results(scores, all_results, other_methods, "bdgraph_sf", 120, 200)
 print_results(scores, all_results, other_methods, "huge_sf", 120, 200)
 print_results(scores, all_results, other_methods, "hubs", 120, 200)
 
-# Define scores for LaTeX tables in main paper.
-scores <- c("MCC", "TPR", "FDR", "sl_omega")
+### Create bodies of LaTeX tabels in the main paper.
 
-# Print body of LaTeX tabels (Table 1 in paper).
+# Define network estimation scores for LaTeX table in main paper.
+scores <- c("MCC", "TPR", "FPR", "FDR")
+
+# Print bodies of LaTeX tabel.
 create_latex_table(scores, all_results, random_methods, "random", 120, 100)
 create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 100)
 create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 100)
@@ -99,28 +101,42 @@ create_latex_table(scores, all_results, random_methods, "random", 120, 200)
 create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 200)
 create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 200)
 create_latex_table(scores, all_results, other_methods, "hubs", 120, 200)
+
+# Define precision matrix estimation scores for LaTeX table in main paper.
+scores <- c("f_norm_rel", "sl_omega")
+
+# Print bodies of LaTeX tabel.
+create_latex_table(scores, all_results, random_methods, "random", 120, 100)
+create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 100)
+create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 100)
+create_latex_table(scores, all_results, other_methods, "hubs", 120, 100)
+
+create_latex_table(scores, all_results, random_methods, "random", 120, 200)
+create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 200)
+create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 200)
+create_latex_table(scores, all_results, other_methods, "hubs", 120, 200)
+
+# Create body of the run time table.
+create_latex_table("time", all_results, random_methods, "random", 120, 100)
+create_latex_table("time", all_results, random_methods, "random", 120, 200)
+create_latex_table("time", all_results, other_methods, "bdgraph_sf", 120, 100)
+create_latex_table("time", all_results, other_methods, "bdgraph_sf", 120, 200)
+create_latex_table("time", all_results, other_methods, "huge_sf", 120, 100)
+create_latex_table("time", all_results, other_methods, "huge_sf", 120, 200)
+create_latex_table("time", all_results, other_methods, "hubs", 120, 100)
+create_latex_table("time", all_results, other_methods, "hubs", 120, 200)
+
+create_latex_table("total_time", all_results, random_methods, "random", 120, 100)
+create_latex_table("total_time", all_results, random_methods, "random", 120, 200)
+create_latex_table("total_time", all_results, other_methods, "bdgraph_sf", 120, 100)
+create_latex_table("total_time", all_results, other_methods, "bdgraph_sf", 120, 200)
+create_latex_table("total_time", all_results, other_methods, "huge_sf", 120, 100)
+create_latex_table("total_time", all_results, other_methods, "huge_sf", 120, 200)
+create_latex_table("total_time", all_results, other_methods, "hubs", 120, 100)
+create_latex_table("total_time", all_results, other_methods, "hubs", 120, 200)
 
 #######
-# Next lines are all for Supporting information.
-
-######
-# Create full LaTeX tables for Supporting information.
-# Define scores.
-scores <- c("MCC", "TPR", "FPR", "FDR", "f_norm_rel", "sl_omega", "time")
-
-# Print bodies of LaTeX tabels. First, p = 100.
-# Supporting Information table D.
-create_latex_table(scores, all_results, random_methods, "random", 120, 100)
-create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 100)
-create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 100)
-create_latex_table(scores, all_results, other_methods, "hubs", 120, 100)
-
-# Next, p = 200
-# Supporting Information table E.
-create_latex_table(scores, all_results, random_methods, "random", 120, 200)
-create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 200)
-create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 200)
-create_latex_table(scores, all_results, other_methods, "hubs", 120, 200)
+# Next lines are all for Supplementary Materials.
 
 #######
 # GHS LLA runtimes and proportion of the tau's tuning times.
@@ -141,7 +157,3 @@ for (n in sample_sizes) {
 # Create LaTeX table of mean number of false positives for Supporting Information.
 # Supporting Information table F.
 create_false_positives_table(all_results, random_methods, structures, sample_sizes, variable_numbers)
-
-######
-# Create runtime table. Not presented in the paper or Supporting Information.
-create_runtime_table(all_results, other_methods, structures, sample_sizes, variable_numbers)

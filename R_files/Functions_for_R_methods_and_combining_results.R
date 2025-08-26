@@ -195,21 +195,36 @@ add_MATLAB_results <- function(results_list, methods, structures, sample_sizes, 
 
 print_results <- function(scores, results_list, methods, structure, n, p, return = FALSE) {
   mean_results <- sd_results <- data.frame()
+  add_total_time <- FALSE
+  if (any(scores == "total_time")) {
+    scores <- scores[-which(scores == "total_time")]
+    add_total_time <- TRUE
+  }
   for (method in methods) {
-    mean_scores <- apply(results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$results[, scores],
-                         2, mean)
+    if (length(scores) > 1) {
+      mean_scores <- apply(results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$results[, scores],
+                           2, mean)
+      sd_scores <- apply(results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$results[, scores],
+                         2, sd)
+    }
+    else {
+      mean_scores <- apply(as.data.frame(results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$results[, scores]),
+                           2, mean)
+      sd_scores <- apply(as.data.frame(results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$results[, scores]),
+                         2, sd)
+    }
+    names(mean_scores) <- names(sd_scores) <- scores
     mean_scores <- as.list(mean_scores)
-    if (any(scores == "time")) {
+    sd_scores <- as.list(sd_scores)
+    if (add_total_time) {
       tot_time <- results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$total_time
       mean_scores$total_time <- as.double(tot_time, units = "secs")
+      sd_scores$total_time <- NA
     }
-    sd_scores <- apply(results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$results[, scores],
-                       2, sd)
     mean_results <- rbind(mean_results, mean_scores)
     sd_results <- rbind(sd_results, sd_scores)
   }
   rownames(mean_results) <- rownames(sd_results) <- methods
-  colnames(sd_results) <- scores
   if (return) {
     return(list(means = mean_results, sds = sd_results))
   }
@@ -276,13 +291,9 @@ create_latex_table <- function(scores, results_list, methods, structure, n, p, h
         cat(format(paste0(" & ", mean_score, " (",
                           sprintf("%.4f", round(score_sd, 4)), ")"),  width = 27))
       }
-      else if (score == "time") {
-        tot_time <- results_list[[method]][[structure]][[paste0("n", n, "_p", p)]]$total_time
-        tot_time <- as.double(tot_time, units = "secs")
-        rf_tot <- select_rounding(tot_time)
+      else if (score == "time" | score == "total_time") {
         rf_mean <- select_rounding(score_mean)
-        cat(paste0(" & ", format(sprintf(rf_mean[2], round(score_mean, as.numeric(rf_mean[1]))), width = 6),
-                   " & ", format(sprintf(rf_tot[2], round(tot_time, as.numeric(rf_tot[1]))), width = 6)))
+        cat(paste0(" & ", format(sprintf(rf_mean[2], round(score_mean, as.numeric(rf_mean[1]))), width = 6)))
       }
       else if (score == "sl_omega") {
         if (is.na(score_mean)) {

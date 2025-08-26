@@ -1,4 +1,4 @@
-library(GHSGEM)
+library(GHSCM)
 library(R.matlab)
 library(doParallel)
 
