@@ -1,9 +1,9 @@
 
-# Results of the article: GHSCM: Efficient MAP inference for gene co-expression networks with the GHS prior
+# Results of the article: GHSCM: Efficient MAP inference for biological networks with the GHS prior
 
 This repository contains all codes and results files used to produce the
 results for the article *GHSCM: Efficient maximum a posteriori inference
-for gene co-expression networks with the graphical horseshoe prior*.
+for biological networks with the graphical horseshoe prior*.
 
 We implemented our method in the R package called GHSCM, which is
 available on GitHub at <https://github.com/THautamaki/GHSCM>.
@@ -65,7 +65,7 @@ follows:
 
 ## Performing the simulation analyses
 
-> [!IMPORTANT] 
+> [!IMPORTANT]
 > All provided scripts assume the working directory has
 > the same directory structure as this repository. The scripts use
 > relative paths to read and save files.
@@ -127,36 +127,35 @@ MATLAB’s `Run all sections` shortcut. Finally, the remaining lines from
 the R script can be executed. It performs the GHS CM method, calculates
 the numbers used in the article, and plots the estimated networks.
 
-## Supporting Information
+## Supplementary materials
 
 ### Analysis of the kappa threshold
 
-Supporting Information Figures A, B, and C can be created using the R
-script `Analysis_of_kappa_threshold.R`.
+Supplementary Figures S1-S3 can be created using the R script
+`Analysis_of_kappa_threshold.R`.
 
 ### Analysis of the initial values of the GHS CM algorithm
 
 Analysis of the initial values of the GHS CM algorithm, as presented in
-the Supporting Information, can be performed using the R script
-`Analysis_of_initial_values.R` (Supporting Information Tables A and B).
-Please note that the analysis requires about 3.5 hours to complete,
-assuming a system with similar specifications is used, as described
-above.
+the Supplementary materials, can be performed using the R script
+`Analysis_of_initial_values.R` (Supplementary Tables S1 and S2). Please
+note that the analysis requires about 3.5 hours to complete, assuming a
+system with similar specifications is used, as described above.
 
 ### Parameter c in the global scale parameter formula
 
-Supporting Information Figure D can be created using the R script
+Supplementary Figure S4 can be created using the R script
 `Analysis_of_c_parameter.R`. Please note that the analysis requires
 approximately 5 hours to complete, assuming a system with similar
 specifications is used, as described above.
 
-### Complete results of the simulations
+### Additional results of the simulations
 
-Supporting Information Tables C–F can be created using the main R script
-`Run_simulations_R_methods_and_combine_results.R` (lines 104–138).
+Supplementary Tables S3 and S4 can be created using the main R script
+`Run_simulations_R_methods_and_combine_results.R` (lines 138–160).
 
 ### Additional analysis with the fastGHS method
 
-We did additional analysis, which can be reproduced using the R script
-`Additional_fastGHS_analysis.R` (Supporting Information Figures E and
-F).
+We did additional analysis with the R package fastGHS, which can be
+reproduced using the R script `Additional_fastGHS_analysis.R`
+(Supplementary Figures S5 and S6).
