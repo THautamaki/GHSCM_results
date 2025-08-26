@@ -46,8 +46,8 @@ follows:
     generated. Please store the real-world datasets in the directories
     named `CEU_dataset` and `DLBC_dataset`.
 - Figures
-  - Contains all figures generated for the main article and Supporting
-    Information in own directories.
+  - Contains all figures generated for the main article and
+    Supplementary materials in own directories.
 - MATLAB_files
   - The root contains some helper functions.
   - Each method has its directories where associated codes are.
