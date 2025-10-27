@@ -476,3 +476,48 @@ create_false_positives_table <- function(all_results, methods, structures, sampl
     cat(" \\\\ \n")
   }
 }
+
+create_sparsity_table <- function(all_results, methods, structures, sample_sizes, variable_numbers) {
+  for (n in sample_sizes) {
+    for (p in variable_numbers) {
+      cat("p: ", p, "\n")
+      for (method in random_methods) {
+        if (method == "GHSCM") {
+          cat(format("GHS CM, $p_0=p-1$", width = 19), sep = "")
+        }
+        else if (method == "GHSCM_p/2") {
+          cat(format("GHS CM, $p_0=p/2$", width = 19), sep = "")
+        }
+        else if (method == "GHS_MCMC") {
+          cat(format("GHS MCMC", width = 19), sep = "")
+        }
+        else if (method == "GHS_LLA") {
+          cat(format("GHS LLA", width = 19), sep = "")
+        }
+        else if (method == "HSL_MCMC") {
+          cat(format("GHS-like MCMC", width = 19), sep = "")
+        }
+        else if (method == "HSL_ECM") {
+          cat(format("GHS-like ECM", width = 19), sep = "")
+        }
+        else if (method == "GLASSO") {
+          cat(format("GLASSO (StARS)", width = 19), sep = "")
+        }
+        else if (method == "fastGHS") {
+          cat(format("GHS ECM", width = 19), sep = "")
+        }
+        else {
+          cat(format(method, width = 19), sep = "")
+        }
+        for (structure in structures) {
+          edge_count <- all_results[[method]][[structure]][[paste0("n", n, "_p", p)]]$results$edge_count
+          sparsity <- 1 - edge_count / (p * (p - 1) / 2)
+          mean_sparsity <- mean(sparsity) * 100
+          sd_sparsity <- sd(sparsity) * 100
+          cat(" & ", sprintf("%.1f", round(mean_sparsity, 1)), " (", sprintf("%.1f", round(sd_sparsity, 1)), ") ", sep = "")
+        }
+        cat("\\\\\n")
+      }
+    }
+  }
+}

@@ -136,11 +136,11 @@ create_latex_table("total_time", all_results, other_methods, "hubs", 120, 100)
 create_latex_table("total_time", all_results, other_methods, "hubs", 120, 200)
 
 #######
-# Next lines are all for Supplementary Materials.
+# Next lines are all for Appendix.
 
 #######
 # GHS LLA runtimes and proportion of the tau's tuning times.
-# Supporting information table C.
+# Appendix Table D2.
 for (n in sample_sizes) {
   for (p in variable_numbers) {
     cat("n: ", n, ", p: ", p, "\n", sep = "")
@@ -154,6 +154,27 @@ for (n in sample_sizes) {
 }
 
 ######
-# Create LaTeX table of mean number of false positives for Supporting Information.
-# Supporting Information table F.
+# Create LaTeX table of mean number of false positives for Appendix
+# Appendix Table D.1.
 create_false_positives_table(all_results, random_methods, structures, sample_sizes, variable_numbers)
+
+######
+# Create LaTex table of mean number of sparsities for Appendix.
+create_sparsity_table(all_results, random_methods, structures, sample_sizes, variable_numbers)
+
+### True sparsities
+# p = 100
+# BDgraph random
+round(100 - (50 / (100 * (100 - 1) / 2) * 100), 2)
+# Scale-free networks (both BDgraph and huge are the same)
+round(100 - (99 / (100 * (100 - 1) / 2) * 100), 2)
+# Hub
+round(100 - (95 / (100 * (100 - 1) / 2) * 100), 2)
+
+# p = 200
+# BDgraph random
+round(100 - (100 / (200 * (200 - 1) / 2) * 100), 2)
+# Scale-free networks (both BDgraph and huge are the same)
+round(100 - (199 / (200 * (200 - 1) / 2) * 100), 2)
+# Hub
+round(100 - (190 / (200 * (200 - 1) / 2) * 100), 2)

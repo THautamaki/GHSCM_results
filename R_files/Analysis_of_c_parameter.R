@@ -150,7 +150,7 @@ data.frame(p = agg_results$p1, denominator = agg_results$p1 / agg_results$c, c_o
            c = agg_results$c, difference = agg_results$c - agg_results$p1/5)
 
 # Plot key performance scores.
-pdf("Figures/Supporting_information/c_parameter_scores.pdf", width = 7, height = 9)
+pdf("Figures/Supplementary/c_parameter_scores.pdf", width = 7, height = 9)
 par(mfrow = c(3,2))
 par(mgp = c(2, 1, 0))
 par(mar = c(3.1, 3.1, 0.2, 0.2))
@@ -162,9 +162,9 @@ plot(p, agg_results[,score], type = "l", xlab = "Number of variables", ylab = sc
               max(agg_results[,score], agg_results2[,score])),
      col = col, lty = lty)
 lines(p, agg_results2[,score], col = "black", lty = 1, lwd = 1)
-legend("topright", legend = c("Default c", "FDR-controlled c"), lty = c(1, lty), col = c("black", col),
-       lwd = c(1,1))
 grid()
+legend("topright", legend = c("Default c", "FDR-controlled c"), lty = c(1, lty), col = c("black", col),
+       lwd = c(1,1), bg = "white")
 
 score <- "FPR"
 plot(p, agg_results[,score], type = "l", xlab = "Number of variables", ylab = score,
