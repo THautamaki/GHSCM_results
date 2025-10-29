@@ -28,7 +28,7 @@ for(thr in thresholds) {
   threshold_scores <- rbind(threshold_scores, cbind(thr, scores))
 }
 
-pdf("Figures/Supporting_information/Thresholding_normal_case_example.pdf", width = 12, height = 3)
+pdf("Figures/Supplementary/Thresholding_normal_case_example.pdf", width = 12, height = 3)
 par(mfrow = c(1,4))
 par(mgp = c(2, 1, 0))
 par(mar = c(3.1, 3.1, 0.2, 0.2))
@@ -72,7 +72,7 @@ for(thr in thresholds) {
   threshold_scores <- rbind(threshold_scores, cbind(thr, scores))
 }
 
-pdf("Figures/Supporting_information/Thresholding_worse_case_example.pdf", width = 12, height = 3)
+pdf("Figures/Supplementary/Thresholding_worse_case_example.pdf", width = 12, height = 3)
 par(mfrow = c(1,4))
 par(mgp = c(2, 1, 0))
 par(mar = c(3.1, 3.1, 0.2, 0.2))
@@ -117,7 +117,7 @@ for(thr in thresholds) {
   threshold_scores <- rbind(threshold_scores, cbind(thr, scores))
 }
 
-pdf("Figures/Supporting_information/Thresholding_tau_tuned.pdf", width = 12, height = 3)
+pdf("Figures/Supplementary/Thresholding_tau_tuned.pdf", width = 12, height = 3)
 par(mfrow = c(1,4))
 par(mgp = c(2, 1, 0))
 par(mar = c(3.1, 3.1, 0.2, 0.2))
