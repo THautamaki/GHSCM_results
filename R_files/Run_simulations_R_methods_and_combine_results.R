@@ -88,7 +88,7 @@ print_results(scores, all_results, other_methods, "hubs", 120, 200)
 
 ### Create bodies of LaTeX tabels in the main paper.
 
-# Define network estimation scores for LaTeX table in main paper.
+# Define network estimation scores for LaTeX table in main paper (Table 2).
 scores <- c("MCC", "TPR", "FPR", "FDR")
 
 # Print bodies of LaTeX tabel.
@@ -102,7 +102,7 @@ create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 200)
 create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 200)
 create_latex_table(scores, all_results, other_methods, "hubs", 120, 200)
 
-# Define precision matrix estimation scores for LaTeX table in main paper.
+# Define precision matrix estimation scores for LaTeX table in main paper (Table 3).
 scores <- c("f_norm_rel", "sl_omega")
 
 # Print bodies of LaTeX tabel.
@@ -116,7 +116,7 @@ create_latex_table(scores, all_results, other_methods, "bdgraph_sf", 120, 200)
 create_latex_table(scores, all_results, other_methods, "huge_sf", 120, 200)
 create_latex_table(scores, all_results, other_methods, "hubs", 120, 200)
 
-# Create body of the run time table.
+# Create body of the run time table (Table 4).
 create_latex_table("time", all_results, random_methods, "random", 120, 100)
 create_latex_table("time", all_results, random_methods, "random", 120, 200)
 create_latex_table("time", all_results, other_methods, "bdgraph_sf", 120, 100)
@@ -138,9 +138,8 @@ create_latex_table("total_time", all_results, other_methods, "hubs", 120, 200)
 #######
 # Next lines are all for Appendix.
 
-#######
-# GHS LLA runtimes and proportion of the tau's tuning times.
-# Appendix Table D2.
+####
+# GHS LLA runtimes and proportion of the tau's tuning times for Appendix D (Table D.3).
 for (n in sample_sizes) {
   for (p in variable_numbers) {
     cat("n: ", n, ", p: ", p, "\n", sep = "")
@@ -153,16 +152,15 @@ for (n in sample_sizes) {
   }
 }
 
-######
-# Create LaTeX table of mean number of false positives for Appendix
-# Appendix Table D.1.
+####
+# Create LaTeX table body of mean number of false positives for Appendix D (Table D.2).
 create_false_positives_table(all_results, random_methods, structures, sample_sizes, variable_numbers)
 
-######
-# Create LaTex table of mean number of sparsities for Appendix.
+####
+# Create LaTex table body of mean number of sparsities for Appendix D (Table D.1).
 create_sparsity_table(all_results, random_methods, structures, sample_sizes, variable_numbers)
 
-### True sparsities
+# True sparsities
 # p = 100
 # BDgraph random
 round(100 - (50 / (100 * (100 - 1) / 2) * 100), 2)

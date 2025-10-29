@@ -102,7 +102,7 @@ GHSCM_vs_GHS_MCMC_results <- add_R_results2(GHSCM_vs_GHS_MCMC_results, methods =
 
 # Define scores.
 scores <- c("MCC", "TPR", "FDR", "sl_mean")
-# Print latex tables (Table 3 in the paper).
+# Print latex tables (Table 5 in the paper).
 create_latex_table(scores, GHSCM_vs_GHS_MCMC_results, c("random_p/2", structures),
                    structure = "GHSCM_vs_GHS_MCMC", n = 120, p = 100, highlight_best = FALSE)
 create_latex_table(scores, GHSCM_vs_GHS_MCMC_results, c("random_p/2", structures),
