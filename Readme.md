@@ -127,35 +127,41 @@ MATLAB’s `Run all sections` shortcut. Finally, the remaining lines from
 the R script can be executed. It performs the GHS CM method, calculates
 the numbers used in the article, and plots the estimated networks.
 
-## Supplementary materials
+## Appendix and Supplementary materials
 
-### Analysis of the kappa threshold
+### Appendix D
 
-Supplementary Figures S1-S3 can be created using the R script
-`Analysis_of_kappa_threshold.R`.
+Appendix Tables D.1-D.3 can be created using the main R script
+`Run_simulations_R_methods_and_combine_results.R` (lines 138–180).
 
 ### Analysis of the initial values of the GHS CM algorithm
 
 Analysis of the initial values of the GHS CM algorithm, as presented in
-the Supplementary materials, can be performed using the R script
+Supplementary materials, can be performed using the R script
 `Analysis_of_initial_values.R` (Supplementary Tables S1 and S2). Please
 note that the analysis requires about 3.5 hours to complete, assuming a
 system with similar specifications is used, as described above.
 
-### Parameter c in the global scale parameter formula
+### Parameter $c$ in the global scale parameter formula
 
-Supplementary Figure S4 can be created using the R script
+Supplementary Fig. S1 can be created using the R script
 `Analysis_of_c_parameter.R`. Please note that the analysis requires
 approximately 5 hours to complete, assuming a system with similar
 specifications is used, as described above.
 
-### Additional results of the simulations
+### Analysis across different values of $\tau^2$
 
-Supplementary Tables S3 and S4 can be created using the main R script
-`Run_simulations_R_methods_and_combine_results.R` (lines 138–160).
+This analysis can be run using the R script
+`Analysis_of_tau_values_through_p0.R`. Creates supplementary Figs. S2
+and S3, and Supplementary Table S3.
+
+### Analysis of the threshold value of $\kappa$
+
+Supplementary Figures S4-S6 can be created using the R script
+`Analysis_of_kappa_threshold.R`.
 
 ### Additional analysis with the fastGHS method
 
 We did additional analysis with the R package fastGHS, which can be
 reproduced using the R script `Additional_fastGHS_analysis.R`
-(Supplementary Figures S5 and S6).
+(Supplementary Figs. S7 and S8).
