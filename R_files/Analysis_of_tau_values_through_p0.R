@@ -176,6 +176,7 @@ max_p0 <- max(mean_scores_p100_sf$n60$p0)
 round(cbind(calculate_tau(p * ratios, p, min_p0),
             calculate_tau(p * ratios, p, max_p0)), 4)
 
+
 ### Analysis with p = 100 and random structure with network size p/2.
 # Define needed parameters.
 p <- 100
@@ -327,7 +328,7 @@ round(cbind(calculate_tau(p * ratios, p, min_p0),
             calculate_tau(p * ratios, p, max_p0)), 4)
 
 
-# Combine all plots with p = 100 in one figure.
+### Combine all plots with p = 100 in one figure.
 pdf("Figures/Supplementary/Tau_analysis_p100.pdf", width = 10.5, height = 10.5)
 par(mfrow = c(3,3))
 plot_sparsity_mcc_f1(100, mean_scores_p100_sf, true_sparsity = true_sparsity_sf_p100,
@@ -488,7 +489,8 @@ max_p0 <- max(mean_scores_p250_cluster$n150$p0)
 round(cbind(calculate_tau(p * ratios, p, min_p0),
             calculate_tau(p * ratios, p, max_p0)), 5)
 
-# # Combine plots with p = 200 and 250 in one figure.
+
+### Combine plots with p = 200 and 250 in one figure.
 pdf("Figures/Supplementary/Tau_analysis_p200-250.pdf", width = 10.5, height = 7)
 par(mfrow = c(2,3))
 plot_sparsity_mcc_f1(200, mean_scores_p200_hub, true_sparsity = true_sparsity_hub_p200,
