@@ -56,12 +56,17 @@ follows:
 - R_files
   - Contains all codes used in the R.
 - Results_files
-  - The root contains the total times of the MATLAB methods.
+  - The root contains the total times of the MATLAB methods, and the
+    additional analysis results with different sample sizes using
+    `fastGHS`.
   - The simulations with both problem dimensions $p = \{100, 200\}$ have
     their directories, where results are stored per method per
     directory.
   - Both real-world datasets have their directories containing all
     results files.
+  - Results of run time analysis in own directory.
+  - Results of additional analyses in Supplementary materials are in own
+    directories.
 
 ## Performing the simulation analyses
 
