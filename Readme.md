@@ -97,13 +97,22 @@ run-to-run variance as we do not use fixed seeds for every MATLAB method
 > 64 GB of RAM), all simulations require approximately 4.5 days to
 > complete.
 
-### Closer comparison with GHS MCMC
+### Closer comparison with the GHS MCMC method
 
 To run closer comparison with the GHS MCMC method, we created R script
 named `Compare_GHSCM_and_GHS_MCMC_estimates.R`. It runs GHS CM
 estimation as we do not save the precision or adjacency matrices in the
 simulation studies, and then compares estimates with the GHS MCMC method
 (matrices are saved earlier).
+
+### Scalability of the GHS CM method
+
+The scalability analysis can be run using the R script
+`Analysis_of_scalability.R`. Additionally, the memory consumption can be
+studied using the R scripts `Run_p1000_10_iterations.R` and
+`Run_p2000_2_iterations.R`. To ensure that R does not use excessive
+memory, run the script using Rscript on the Windows command line and
+monitor memory usage in Task Manager.
 
 ## Performing the real-world dataset analyses
 
