@@ -111,8 +111,8 @@ The scalability analysis can be run using the R script
 `Analysis_of_scalability.R`. Additionally, the memory consumption can be
 studied using the R scripts `Run_p1000_10_iterations.R` and
 `Run_p2000_2_iterations.R`. To ensure that R does not use excessive
-memory, run the script using Rscript on the Windows command line and
-monitor memory usage in Task Manager.
+memory, run these two scripts separately using Rscript on the Windows
+command line and monitor memory usage in Task Manager.
 
 ## Performing the real-world dataset analyses
 
