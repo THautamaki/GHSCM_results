@@ -43,22 +43,16 @@ generate_datasets <- function(sample_sizes = 120, variable_numbers = c(100, 200)
         sim1$theta <- sim1$G
         simulations[[paste0("n", n, "_p", p)]][["random"]][[i]] <- sim1
         
-        # Set seed so the same datasets can be generated again.
-        seed <- 20251202 + i + p
         # Generate simulated dataset with random structure using bdgraph.sim function.
         sim2 <- BDgraph::bdgraph.sim(p = p, n = n, graph = "scale-free")
         sim2$omega <- sim2$K
         sim2$theta <- sim2$G
         simulations[[paste0("n", n, "_p", p)]][["bdgraph_sf"]][[i]] <- sim2
         
-        # Set seed so the same datasets can be generated again.
-        seed <- 20261202 + i + p
         # Generate simulated dataset with random structure using bdgraph.sim function.
         sim3 <- huge::huge.generator(n = n, d = p, graph = "scale-free", verbose = FALSE)
         simulations[[paste0("n", n, "_p", p)]][["huge_sf"]][[i]] <- sim3
         
-        # Set seed so the same datasets can be generated again.
-        seed <- 20271202 + i + p
         # Generate simulated dataset with random structure using bdgraph.sim function.
         sim4 <- huge::huge.generator(n = n, d = p, graph = "hub", verbose = FALSE)
         simulations[[paste0("n", n, "_p", p)]][["hubs"]][[i]] <- sim4
