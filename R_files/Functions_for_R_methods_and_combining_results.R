@@ -33,8 +33,11 @@ run_analysis <- function(structure, n, p, method = "GHSCM", p0 = 0, save_results
   else if (tolower(method) == "fastghs") {
     packages <- c("fastGHS", "GHSCM")
   }
+  else if (tolower(method) == "tiger" | tolower(method) == "clime") {
+    packages <- c("flare", "GHSCM")
+  }
   else {
-    stop("Wrong method! Possible choices are 'GHSCM', 'GLASSO', 'pulsar', 'beam', and 'fastGHS'.")
+    stop("Wrong method! Possible choices are 'GHSCM', 'GLASSO', 'pulsar', 'beam', 'fastGHS', 'TIGER', and 'CLIME'.")
   }
   cl <- makeCluster(cores)
   registerDoParallel(cl)
@@ -90,6 +93,24 @@ run_analysis <- function(structure, n, p, method = "GHSCM", p0 = 0, save_results
       omega_est <- result$theta
       sigma_est <- result$sigma
     }
+    else if (tolower(method) == "tiger") {
+      n <- nrow(sim$data)
+      p <- ncol(sim$data)
+      tiger_start <- Sys.time()
+      result <- sugm(sim$data, method = "tiger", verbose = FALSE)
+      time <- as.numeric(difftime(Sys.time(), tiger_start, units = "secs"))
+      theta_est <- result$path[[5]]
+      omega_est <- result$icov[[5]]
+    }
+    else if (tolower(method) == "clime") {
+      n <- nrow(sim$data)
+      p <- ncol(sim$data)
+      tiger_start <- Sys.time()
+      result <- sugm(sim$data, method = "clime", verbose = FALSE)
+      time <- as.numeric(difftime(Sys.time(), tiger_start, units = "secs"))
+      theta_est <- result$path[[4]]
+      omega_est <- result$icov[[4]]
+    }
     edge_count <- sum(theta_est) / 2
     cm <- conf_matrix(sim$theta, theta_est)
     sl_omega <- NA
@@ -104,7 +125,7 @@ run_analysis <- function(structure, n, p, method = "GHSCM", p0 = 0, save_results
       f_norm_sigma <- norm(sim$sigma - sigma_est, type = "f")
       f_norm_rel <- f_norm_omega / norm(sim$omega, type = "f")
     }
-    else if (tolower(method) == "glasso") {
+    else if (tolower(method) == "glasso" | tolower(method) == "tiger" | tolower(method == "clime")) {
       sl_omega <- stein_loss(sim$omega, omega_est)
       f_norm_omega <- norm(sim$omega - omega_est, type = "f")
       f_norm_rel <- f_norm_omega / norm(sim$omega, type = "f")
