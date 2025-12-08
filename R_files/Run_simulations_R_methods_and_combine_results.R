@@ -26,6 +26,9 @@ if(!require("igraph", quietly = TRUE)) {
 if(!require("R.matlab", quietly = TRUE)) {
   install.packages("R.matlab")
 }
+if(!require("flare", quietly = TRUE)) {
+  install.packages("flare")
+}
 
 # Load packages.
 library(GHSCM)
@@ -34,6 +37,7 @@ library(huge)
 library(fastGHS)
 library(doParallel)
 library(pulsar)
+library(flare)
 
 # Load functions needed for the analyses.
 source("R_files/Generate_datasets.R")
@@ -49,7 +53,7 @@ if (!data_generated) {
 sample_sizes <- c(120)
 variable_numbers <- c(100, 200)
 structures <- c("random", "bdgraph_sf", "huge_sf", "hubs")
-R_methods <- c("GHSCM", "GLASSO", "fastGHS")
+R_methods <- c("GHSCM", "GLASSO", "fastGHS", "TIGER", "CLIME")
 MATLAB_methods <- c("GHS_MCMC", "GHS_LLA", "HSL_MCMC", "HSL_ECM")
 
 # Run all R methods if not yet run.
