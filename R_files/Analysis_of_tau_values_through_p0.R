@@ -1,4 +1,5 @@
 library(doParallel)
+library(latex2exp)
 
 calculation_over_p0 <- function(p, n = 0, p0s = NULL, n_p0s = 50, step_p0 = 5,
                                 structure = "scale-free", net_size = 0,
@@ -103,6 +104,59 @@ plot_sparsity_mcc_f1 <- function(p, mean_scores, true_sparsity, x_label, ylim_sp
   if (!is.null(filename)) dev.off()
 }
 
+plot_sparsity_mcc_sl <- function(p, mean_scores, true_sparsity, x_label, ylim_sparsity,
+                                 ylim_steinloss, legend,
+                                 legend_position = "bottomleft", legend_in_plot = 1,
+                                 plot_rows = 1, filename = NULL, save_eps = FALSE, save_pdf = FALSE,
+                                 image_size = c(10.5, 3.5)) {
+  if (save_eps) {
+    setEPS()
+    postscript(filename, width = image_size[1], height = image_size[2])
+  }
+  else if (save_pdf) {
+    pdf(filename, width = image_size[1], height = image_size[2])
+  }
+  ltys <- rep(c(2,4,5,6,1), length.out = length(mean_scores))
+  cols <- palette.colors(length(mean_scores))
+  if (plot_rows == 1) par(mfrow = c(1,3))
+  par(mgp = c(2, 1, 0))
+  par(mar = c(3.1, 3.3, 0.5, 0.2))
+  plot(mean_scores[[1]]$p0, mean_scores[[1]]$sparsity, type = "l", xlab = x_label,
+       ylab = "sparsity", lty = ltys[1], col = cols[1], ylim = ylim_sparsity)
+  for (i in 2:length(mean_scores)) {
+    lines(mean_scores[[i]]$p0, mean_scores[[i]]$sparsity, lty = ltys[i], col = cols[i])
+  }
+  grid()
+  abline(h = true_sparsity, lty = 2, col = "blue")
+  abline(v = p - 1, lty = 2, col = "blue")
+  if (legend_in_plot == 1) {
+    legend(legend_position, legend, lty = c(ltys, 2), col = c(cols, "blue"), bg = "white")
+  }
+  
+  plot(mean_scores[[1]]$p0, mean_scores[[1]]$MCC, type = "l", xlab = x_label, ylab = "MCC",
+       ylim = c(0,1), lty = ltys[1], col = cols[1])
+  for (i in 2:length(mean_scores)) {
+    lines(mean_scores[[i]]$p0, mean_scores[[i]]$MCC, lty = ltys[i], col = cols[i])
+  }
+  grid()
+  abline(v = p - 1, lty = 2, col = "blue")
+  if (legend_in_plot == 2) {
+    legend(legend_position, legend, lty = c(ltys, 2), col = c(cols, "blue"), bg = "white")
+  }
+  
+  plot(mean_scores[[1]]$p0, mean_scores[[1]]$sl_omega, type = "l", xlab = x_label,
+       ylab = TeX("Stein's loss ($\\widehat{\\Omega}$)"), ylim = ylim_steinloss, lty = ltys[1], col = cols[1])
+  for (i in 2:length(mean_scores)) {
+    lines(mean_scores[[i]]$p0, mean_scores[[i]]$sl_omega, lty = ltys[i], col = cols[i])
+  }
+  grid()
+  abline(v = p - 1, lty = 2, col = "blue")
+  if (legend_in_plot == 3) {
+    legend(legend_position, legend, lty = c(ltys, 2), col = c(cols, "blue"), bg = "white")
+  }
+  if (!is.null(filename)) dev.off()
+}
+
 ### Analysis with p = 100 and scale-free structure.
 # Define needed parameters.
 p <- 100
@@ -153,7 +207,7 @@ for (i in 1:length(mean_scores_p100_sf)) {
 }
 if (all(true_sparsities == true_sparsities[1,1])) {
   true_sparsity_sf_p100 <- true_sparsities[1,1]
-  cat("All sparsities are equal. True sparsity is:", true_sparsity)
+  cat("All sparsities are equal. True sparsity is:", true_sparsity_sf_p100)
 } else {
   true_sparsity_sf_p100 <- mean(as.matrix(true_sparsities))
   sd_sparsity <- sd(as.matrix(true_sparsities))
@@ -165,10 +219,17 @@ if (all(true_sparsities == true_sparsities[1,1])) {
 legend_p100 <- c(paste("n =", floor(p * ratios)), expression(paste("true sparsity / default ", p[0])))
 x_label <- expression(paste("Prior guess of the number of connections, ", p[0]))
 
-# Create and save plot.
-plot_sparsity_mcc_f1(p, mean_scores_p100_sf, true_sparsity = true_sparsity_sf_p100, x_label = x_label,
+# Create and save plot (Fig. xx in main manuscript).
+#plot_sparsity_mcc_f1(p, mean_scores_p100_sf, true_sparsity = true_sparsity_sf_p100, x_label = x_label,
+#                     legend = legend_p100, ylim_sparsity = c(min(est_sparsities_sf_p100), max(est_sparsities_sf_p100)),
+#                     filename = "Figures/Supplementary/Tau_analysis_p100_sf.pdf")
+
+
+plot_sparsity_mcc_sl(p, mean_scores_p100_sf, true_sparsity = true_sparsity_sf_p100, x_label = x_label,
                      legend = legend_p100, ylim_sparsity = c(min(est_sparsities_sf_p100), max(est_sparsities_sf_p100)),
-                     filename = "Figures/Supplementary/Tau_analysis_p100_sf.pdf")
+                     ylim_steinloss = c(min(mean_scores_p100_sf$n400$sl_omega), max(mean_scores_p100_sf$n60$sl_omega)),
+                     filename = "Figures/Main_article/Tau_analysis_p100_sf.eps", save_eps = TRUE, save_pdf = FALSE,
+                     image_size = c(9,3))
 
 # Corresponding tau^2 values.
 min_p0 <- min(mean_scores_p100_sf$n60$p0)
@@ -227,7 +288,7 @@ for (i in 1:length(mean_scores_p100_random)) {
 }
 if (all(true_sparsities == true_sparsities[1,1])) {
   true_sparsity_random_p100 <- true_sparsities[1,1]
-  cat("All sparsities are equal. True sparsity is:", true_sparsity)
+  cat("All sparsities are equal. True sparsity is:", true_sparsity_random_p100)
 } else {
   true_sparsity_random_p100 <- mean(as.matrix(true_sparsities))
   sd_sparsity <- sd(as.matrix(true_sparsities))
@@ -240,9 +301,9 @@ legend_p100 <- c(paste("n =", floor(p * ratios)), expression(paste("true sparsit
 x_label <- expression(paste("Prior guess of the number of connections, ", p[0]))
 
 # Create and save plot.
-plot_sparsity_mcc_f1(p, mean_scores_p100_random, true_sparsity = true_sparsity_random_p100, x_label = x_label,
-                     legend = legend_p100, ylim_sparsity = c(min(est_sparsities_random_p100), max(est_sparsities_random_p100)),
-                     filename = "Figures/Supplementary/Tau_analysis_p100_random.pdf")
+#plot_sparsity_mcc_f1(p, mean_scores_p100_random, true_sparsity = true_sparsity_random_p100, x_label = x_label,
+#                     legend = legend_p100, ylim_sparsity = c(min(est_sparsities_random_p100), max(est_sparsities_random_p100)),
+#                     filename = "Figures/Supplementary/Tau_analysis_p100_random.pdf")
 
 # Corresponding tau^2 values.
 min_p0 <- min(mean_scores_p100_random$n60$p0)
@@ -303,7 +364,7 @@ for (i in 1:length(mean_scores_p100_random_denser)) {
 }
 if (all(true_sparsities == true_sparsities[1,1])) {
   true_sparsity_rnd_dens_p100 <- true_sparsities[1,1]
-  cat("All sparsities are equal. True sparsity is:", true_sparsity)
+  cat("All sparsities are equal. True sparsity is:", true_sparsity_rnd_dens_p100)
 } else {
   true_sparsity_rnd_dens_p100 <- mean(as.matrix(true_sparsities))
   sd_sparsity <- sd(as.matrix(true_sparsities))
@@ -312,14 +373,14 @@ if (all(true_sparsities == true_sparsities[1,1])) {
 }
 
 # Define legend for the plot and label for x-axis.
-legend_p100 <- c(paste("n =", floor(p * ratios)), expression(paste("true sparsity / default ", p[0]))) 
+legend_p100 <- c(paste("n =", floor(p * ratios)), expression(paste("true sparsity / default ", p[0])))
 x_label <- expression(paste("Prior guess of the number of connections, ", p[0]))
 
 # Create and save plot.
-plot_sparsity_mcc_f1(p, mean_scores_p100_random_denser, true_sparsity = true_sparsity_rnd_dens_p100,
-                     x_label = x_label, legend = legend_p100,
-                     ylim_sparsity = c(min(est_sparsities_rnd_dens_p100), max(est_sparsities_rnd_dens_p100)),
-                     filename = "Figures/Supplementary/Tau_analysis_p100_random_denser.pdf")
+#plot_sparsity_mcc_f1(p, mean_scores_p100_random_denser, true_sparsity = true_sparsity_rnd_dens_p100,
+#                     x_label = x_label, legend = legend_p100,
+#                     ylim_sparsity = c(min(est_sparsities_rnd_dens_p100), max(est_sparsities_rnd_dens_p100)),
+#                     filename = "Figures/Supplementary/Tau_analysis_p100_random_denser.pdf")
 
 # Corresponding tau^2 values.
 min_p0 <- min(mean_scores_p100_random_denser$n60$p0)
@@ -327,22 +388,114 @@ max_p0 <- max(mean_scores_p100_random_denser$n60$p0)
 round(cbind(calculate_tau(p * ratios, p, min_p0),
             calculate_tau(p * ratios, p, max_p0)), 4)
 
+### Analysis with p = 100 and hub structure.
+# Define needed parameters.
+p <- 100
+ratios <- c(0.6, 0.8, 1, 1.25, 1.5, 2, 4)
+n_repeats <- 20
+n_p0s <- 75
+step_p0 <- 5
+structure = "hub"
+seed <- 11122025
+
+# Run analysis if results file does not exist.
+if (!file.exists("Results_files/Tau_analyses/scores_p100_hub.rds")) {
+  print(s6 <- Sys.time())
+  scores_p100_hub <- list()
+  for (ratio in ratios) {
+    n <- floor(p * ratio)
+    cat("n =", n, "\n")
+    scores_p100_hub[[paste0("n", n)]] <- calculation_over_p0(p = p, n = n,
+                                                             n_repeats = n_repeats,
+                                                             n_p0s = n_p0s,
+                                                             step_p0 = step_p0,
+                                                             structure = structure,
+                                                             seed = seed)
+  }
+  print(Sys.time() - s6)
+  saveRDS(scores_p100_hub, file = "Results_files/Tau_analyses/scores_p100_hub.rds")
+}
+
+# Load results if analysis is already done.
+if (file.exists("Results_files/Tau_analyses/scores_p100_hub.rds")) {
+  scores_p100_hub <- readRDS("Results_files/Tau_analyses/scores_p100_hub.rds")
+}
+
+# Calculate mean scores.
+mean_scores_p100_hub <- list()
+for (ratio in ratios) {
+  n <- floor(p * ratio)
+  mean_scores_p100_hub[[paste0("n", n)]] <- aggregate(scores_p100_hub[[paste0("n", n)]],
+                                                      by = list(scores_p100_hub[[paste0("n", n)]]$p0),
+                                                      FUN = mean)
+}
+
+# Calculate true sparsity and combine estimated sparsities for y-axis limits.
+true_sparsities <- est_sparsities_hub_p100 <- data.frame()
+for (i in 1:length(mean_scores_p100_hub)) {
+  true_sparsities <- rbind(true_sparsities, mean_scores_p100_hub[[i]]$true_sparsity)
+  est_sparsities_hub_p100 <- rbind(est_sparsities_hub_p100, mean_scores_p100_hub[[i]]$sparsity)
+}
+if (all(true_sparsities == true_sparsities[1,1])) {
+  true_sparsity_hub_p100 <- true_sparsities[1,1]
+  cat("All sparsities are equal. True sparsity is:", true_sparsity_hub_p100)
+} else {
+  true_sparsity_hub_p100 <- mean(as.matrix(true_sparsities))
+  sd_sparsity <- sd(as.matrix(true_sparsities))
+  cat("Sparsities are not equal. Mean (sd) of true sparsity is: ", true_sparsity_hub_p100,
+      " (", round(sd_sparsity, 6), ")", sep = "")
+}
+
+# Define legend for the plot and label for x-axis.
+legend_p100 <- c(paste("n =", floor(p * ratios)), expression(paste("true sparsity / default ", p[0])))
+x_label <- expression(paste("Prior guess of the number of connections, ", p[0]))
+
+# Create and save plot.
+#plot_sparsity_mcc_f1(p, mean_scores_p100_hub, true_sparsity = true_sparsity_rnd_dens_p100,
+#                     x_label = x_label, legend = legend_p100,
+#                     ylim_sparsity = c(min(est_sparsities_hub_p100), max(est_sparsities_hub_p100)),
+#                     filename = "Figures/Supplementary/Tau_analysis_p100_hub.pdf")
+
+# Corresponding tau^2 values.
+min_p0 <- min(mean_scores_p100_hub$n60$p0)
+max_p0 <- max(mean_scores_p100_hub$n60$p0)
+round(cbind(calculate_tau(p * ratios, p, min_p0),
+            calculate_tau(p * ratios, p, max_p0)), 4)
 
 ### Combine all plots with p = 100 in one figure.
-pdf("Figures/Supplementary/Tau_analysis_p100.pdf", width = 10.5, height = 10.5)
+# pdf("Figures/Supplementary/Tau_analysis_p100.pdf", width = 10.5, height = 10.5)
+# par(mfrow = c(3,3))
+# plot_sparsity_mcc_f1(100, mean_scores_p100_sf, true_sparsity = true_sparsity_sf_p100,
+#                      x_label = x_label, legend = legend_p100, plot_rows = 3,
+#                      ylim_sparsity = c(min(est_sparsities_sf_p100), max(est_sparsities_sf_p100)))
+# plot_sparsity_mcc_f1(100, mean_scores_p100_random, true_sparsity = true_sparsity_random_p100,
+#                      x_label = x_label, legend = legend_p100, plot_rows = 3,
+#                      ylim_sparsity = c(min(est_sparsities_random_p100), max(est_sparsities_random_p100)))
+# plot_sparsity_mcc_f1(100, mean_scores_p100_random_denser, true_sparsity = true_sparsity_rnd_dens_p100,
+#                      x_label = x_label, legend = legend_p100, plot_rows = 3,
+#                      ylim_sparsity = c(min(est_sparsities_rnd_dens_p100), max(est_sparsities_rnd_dens_p100)))
+# 
+# dev.off()
+
+### Combine all plots with p = 100 in one figure.
+pdf("Figures/Supplementary/Tau_analysis_with_sl_p100.pdf", width = 10.5, height = 10.5)
 par(mfrow = c(3,3))
-plot_sparsity_mcc_f1(100, mean_scores_p100_sf, true_sparsity = true_sparsity_sf_p100,
-                     x_label = x_label, legend = legend, plot_rows = 3,
-                     ylim_sparsity = c(min(est_sparsities_sf_p100), max(est_sparsities_sf_p100)))
-plot_sparsity_mcc_f1(100, mean_scores_p100_random, true_sparsity = true_sparsity_random_p100,
-                     x_label = x_label, legend = legend, plot_rows = 3,
-                     ylim_sparsity = c(min(est_sparsities_random_p100), max(est_sparsities_random_p100)))
-plot_sparsity_mcc_f1(100, mean_scores_p100_random_denser, true_sparsity = true_sparsity_rnd_dens_p100,
-                     x_label = x_label, legend = legend, plot_rows = 3,
-                     ylim_sparsity = c(min(est_sparsities_rnd_dens_p100), max(est_sparsities_rnd_dens_p100)))
+plot_sparsity_mcc_sl(100, mean_scores_p100_random, true_sparsity = true_sparsity_random_p100,
+                     x_label = x_label, legend = legend_p100, plot_rows = 3,
+                     ylim_sparsity = c(min(est_sparsities_random_p100), max(est_sparsities_random_p100)),
+                     ylim_steinloss = c(min(mean_scores_p100_random$n400$sl_omega), max(mean_scores_p100_random$n60$sl_omega)))
+plot_sparsity_mcc_sl(100, mean_scores_p100_random_denser, true_sparsity = true_sparsity_rnd_dens_p100,
+                     x_label = x_label, legend = legend_p100, plot_rows = 3,
+                     ylim_sparsity = c(min(est_sparsities_rnd_dens_p100), max(est_sparsities_rnd_dens_p100)),
+                     ylim_steinloss = c(min(mean_scores_p100_random_denser$n400$sl_omega), max(mean_scores_p100_random_denser$n60$sl_omega)))
+plot_sparsity_mcc_sl(100, mean_scores_p100_hub, true_sparsity = true_sparsity_hub_p100,
+                     x_label = x_label, legend = legend_p100, plot_rows = 3,
+                     ylim_sparsity = c(min(est_sparsities_hub_p100), max(est_sparsities_hub_p100)),
+                     ylim_steinloss = c(min(mean_scores_p100_hub$n400$sl_omega), max(mean_scores_p100_hub$n60$sl_omega)))
 
 dev.off()
 
+mean_scores_p100_hub
 
 ### Analysis with p = 200 and hub structure.
 # Define needed parameters.
@@ -392,7 +545,7 @@ for (i in 1:length(mean_scores_p200_hub)) {
 }
 if (all(true_sparsities == true_sparsities[1,1])) {
   true_sparsity_hub_p200 <- true_sparsities[1,1]
-  cat("All sparsities are equal. True sparsity is:", true_sparsity)
+  cat("All sparsities are equal. True sparsity is:", true_sparsity_hub_p200)
 } else {
   true_sparsity_hub_p200 <- mean(as.matrix(true_sparsities))
   sd_sparsity <- sd(as.matrix(true_sparsities))
@@ -404,11 +557,11 @@ if (all(true_sparsities == true_sparsities[1,1])) {
 legend_p200 <- c(paste("n =", floor(p * ratios)), expression(paste("true sparsity / default ", p[0]))) 
 x_label <- expression(paste("Prior guess of the number of connections, ", p[0]))
 
-# Create and save plot.
-plot_sparsity_mcc_f1(p, mean_scores_p200_hub, true_sparsity = true_sparsity_hub_p200, x_label = x_label,
-                     legend = legend_p200, legend_position = "topright",
-                     ylim_sparsity = c(min(est_sparsities_hub_p200), max(est_sparsities_hub_p200)),
-                     filename = "Figures/Supplementary/Tau_analysis_p200_hub.pdf")
+# # Create and save plot.
+# plot_sparsity_mcc_f1(p, mean_scores_p200_hub, true_sparsity = true_sparsity_hub_p200, x_label = x_label,
+#                      legend = legend_p200, legend_position = "topright",
+#                      ylim_sparsity = c(min(est_sparsities_hub_p200), max(est_sparsities_hub_p200)),
+#                      filename = "Figures/Supplementary/Tau_analysis_p200_hub.pdf")
 
 # Corresponding tau^2 values.
 min_p0 <- min(mean_scores_p200_hub$n120$p0)
@@ -466,11 +619,11 @@ for (i in 1:length(mean_scores_p250_cluster)) {
 }
 if (all(true_sparsities == true_sparsities[1,1])) {
   true_sparsity_cluster_p250 <- true_sparsities[1,1]
-  cat("All sparsities are equal. True sparsity is:", true_sparsity)
+  cat("All sparsities are equal. True sparsity is:", true_sparsity_cluster_p250)
 } else {
   true_sparsity_cluster_p250 <- mean(as.matrix(true_sparsities))
   sd_sparsity <- sd(as.matrix(true_sparsities))
-  cat("Sparsities are not equal. Mean (sd) of true sparsity is: ", true_sparsity, " (", round(sd_sparsity, 6), ")", sep = "")
+  cat("Sparsities are not equal. Mean (sd) of true sparsity is: ", true_sparsity_cluster_p250, " (", round(sd_sparsity, 6), ")", sep = "")
 }
 
 # Define legend for the plot and label for x-axis.
@@ -491,15 +644,27 @@ round(cbind(calculate_tau(p * ratios, p, min_p0),
 
 
 ### Combine plots with p = 200 and 250 in one figure.
-pdf("Figures/Supplementary/Tau_analysis_p200-250.pdf", width = 10.5, height = 7)
+# pdf("Figures/Supplementary/Tau_analysis_p200-250.pdf", width = 10.5, height = 7)
+# par(mfrow = c(2,3))
+# plot_sparsity_mcc_f1(200, mean_scores_p200_hub, true_sparsity = true_sparsity_hub_p200,
+#                      x_label = x_label, legend = legend_p200, plot_rows = 2, legend_position = "topright",
+#                      ylim_sparsity = c(min(est_sparsities_hub_p200), max(est_sparsities_hub_p200)))
+# plot_sparsity_mcc_f1(250, mean_scores_p250_cluster, true_sparsity = true_sparsity_cluster_p250,
+#                      x_label = x_label, legend = legend_p250, plot_rows = 2,
+#                      legend_in_plot = 2, legend_position = "bottomright",
+#                      ylim_sparsity = c(min(est_sparsities_cluster_p250), max(est_sparsities_cluster_p250)))
+# dev.off()
+
+### Combine plots with p = 200 and 250 in one figure.
+pdf("Figures/Supplementary/Tau_analysis_with_sl_p200-250.pdf", width = 10.5, height = 7)
 par(mfrow = c(2,3))
-plot_sparsity_mcc_f1(200, mean_scores_p200_hub, true_sparsity = true_sparsity_hub_p200,
+plot_sparsity_mcc_sl(200, mean_scores_p200_hub, true_sparsity = true_sparsity_hub_p200,
                      x_label = x_label, legend = legend_p200, plot_rows = 2, legend_position = "topright",
-                     ylim_sparsity = c(min(est_sparsities_hub_p200), max(est_sparsities_hub_p200)))
-plot_sparsity_mcc_f1(250, mean_scores_p250_cluster, true_sparsity = true_sparsity_cluster_p250,
+                     ylim_sparsity = c(min(est_sparsities_hub_p200), max(est_sparsities_hub_p200)),
+                     ylim_steinloss = c(min(mean_scores_p200_hub$n800$sl_omega), max(mean_scores_p200_hub$n120$sl_omega)))
+plot_sparsity_mcc_sl(250, mean_scores_p250_cluster, true_sparsity = true_sparsity_cluster_p250,
                      x_label = x_label, legend = legend_p250, plot_rows = 2,
                      legend_in_plot = 2, legend_position = "bottomright",
-                     ylim_sparsity = c(min(est_sparsities_cluster_p250), max(est_sparsities_cluster_p250)))
-
-
+                     ylim_sparsity = c(min(est_sparsities_cluster_p250), max(est_sparsities_cluster_p250)),
+                     ylim_steinloss = c(min(mean_scores_p250_cluster$n1000$sl_omega), max(mean_scores_p250_cluster$n150$sl_omega)))
 dev.off()

@@ -29,6 +29,15 @@ if(!require("R.matlab", quietly = TRUE)) {
 if(!require("flare", quietly = TRUE)) {
   install.packages("flare")
 }
+if(!require("GGMncv", quietly = TRUE)) {
+  devtools::install_github("donaldRwilliams/GGMncv")
+}
+if(!require("nlshrink", quietly = TRUE)) {
+  install.packages("nlshrink")
+}
+if(!require("scmamp", quietly = TRUE)) {
+  devtools::install_github("b0rxa/scmamp")
+}
 
 # Load packages.
 library(GHSCM)
@@ -38,6 +47,8 @@ library(fastGHS)
 library(doParallel)
 library(pulsar)
 library(flare)
+library(GGMncv)
+library(nlshrink)
 
 # Load functions needed for the analyses.
 source("R_files/Generate_datasets.R")
@@ -53,7 +64,8 @@ if (!data_generated) {
 sample_sizes <- c(120)
 variable_numbers <- c(100, 200)
 structures <- c("random", "bdgraph_sf", "huge_sf", "hubs")
-R_methods <- c("GHSCM", "GLASSO", "fastGHS", "TIGER", "CLIME")
+R_methods <- c("GHSCM", "GLASSO", "fastGHS", "TIGER", "CLIME", "GSCAD")
+R_methods <- c("GSCAD")
 MATLAB_methods <- c("GHS_MCMC", "GHS_LLA", "HSL_MCMC", "HSL_ECM")
 
 # Run all R methods if not yet run.
@@ -71,10 +83,29 @@ all_results <- add_R_results(all_results, R_methods, structures, sample_sizes, v
 all_results <- add_MATLAB_results(all_results, MATLAB_methods,
                                   structures, sample_sizes, variable_numbers)
 
+# Number of empty network estimates of CLIME.
+sum(all_results$CLIME$random$n120_p100$results$edge_count == 0)
+sum(all_results$CLIME$random$n120_p200$results$edge_count == 0)
+sum(all_results$CLIME$bdgraph_sf$n120_p100$results$edge_count == 0)
+sum(all_results$CLIME$bdgraph_sf$n120_p200$results$edge_count == 0)
+
+# Set NaNs to zero for CLIME in MCC and FDR columns.
+all_results$CLIME$random$n120_p100$results$MCC[is.na(all_results$CLIME$random$n120_p100$results$MCC)] <- 0
+all_results$CLIME$random$n120_p100$results$FDR[is.na(all_results$CLIME$random$n120_p100$results$FDR)] <- 0
+all_results$CLIME$random$n120_p200$results$MCC[is.na(all_results$CLIME$random$n120_p200$results$MCC)] <- 0
+all_results$CLIME$random$n120_p200$results$FDR[is.na(all_results$CLIME$random$n120_p200$results$FDR)] <- 0
+
+all_results$CLIME$bdgraph_sf$n120_p100$results$MCC[is.na(all_results$CLIME$bdgraph_sf$n120_p100$results$MCC)] <- 0
+all_results$CLIME$bdgraph_sf$n120_p100$results$FDR[is.na(all_results$CLIME$bdgraph_sf$n120_p100$results$FDR)] <- 0
+all_results$CLIME$bdgraph_sf$n120_p200$results$MCC[is.na(all_results$CLIME$bdgraph_sf$n120_p200$results$MCC)] <- 0
+all_results$CLIME$bdgraph_sf$n120_p200$results$FDR[is.na(all_results$CLIME$bdgraph_sf$n120_p200$results$FDR)] <- 0
+
 # Define the methods and which order they will be printed. GHS CM has two results for random network
 # structure.
-random_methods <- c("GHSCM_p/2", "GHSCM", "GHS_MCMC", "fastGHS", "GHS_LLA", "HSL_MCMC", "HSL_ECM", "GLASSO")
-other_methods <- c("GHSCM", "GHS_MCMC", "fastGHS", "GHS_LLA", "HSL_MCMC", "HSL_ECM", "GLASSO")
+random_methods <- c("GHSCM_p/2", "GHSCM", "GHS_MCMC", "fastGHS", "GHS_LLA", "HSL_MCMC", "HSL_ECM",
+                    "GLASSO", "TIGER", "CLIME", "GSCAD")
+other_methods <- c("GHSCM", "GHS_MCMC", "fastGHS", "GHS_LLA", "HSL_MCMC", "HSL_ECM", "GLASSO",
+                   "TIGER", "CLIME", "GSCAD")
 
 # Define scores which results will be printed.
 scores <- c("MCC", "TPR", "FPR", "FDR", "f_norm_rel", "sl_omega", "time", "total_time")
@@ -139,6 +170,39 @@ create_latex_table("total_time", all_results, other_methods, "huge_sf", 120, 200
 create_latex_table("total_time", all_results, other_methods, "hubs", 120, 100)
 create_latex_table("total_time", all_results, other_methods, "hubs", 120, 200)
 
+# Create critical differences plots.
+# First combine MCC results into matrices.
+column_names <- c("GHS CM", "GHS MCMC", "GHS ECM", "GHS LLA", "GHS-like MCMC", "GHS-like ECM",
+                  "GLASSO (StARS)", "TIGER", "CLIME", "GSCAD (BIC)")
+results_p100 <- results_p200 <- matrix(nrow = 50*4, ncol = length(other_methods))
+j <- 0
+for (structure in structures) {
+  for (i in 1:length(other_methods)) {
+    results_p100[(j*50+1):((j+1)*50),i] <- all_results[[other_methods[i]]][[structure]][["n120_p100"]][["results"]][,"MCC"]
+    results_p200[(j*50+1):((j+1)*50),i] <- all_results[[other_methods[i]]][[structure]][["n120_p200"]][["results"]][,"MCC"]
+  }
+  j <- j + 1
+}
+colnames(results_p100) <- colnames(results_p200) <- column_names
+
+# Next define some variables needed for plotting.
+text_x_pos <- -0.7
+line.spacing <- 0.25
+h.up <- 2.5 * line.spacing
+
+# Save figure as eps image.
+setEPS()
+postscript("Figures/Main_article/CD_diagram.eps", width = 20, height = 5)
+
+par(mfrow = c(1,2))
+plotCD(results_p100, alpha = 0.05, cex = 1.85, char.size = 0.5)
+text(text_x_pos, h.up-0.1, "A", cex = 2.5)
+plotCD(results_p200, alpha = 0.05, cex = 1.85, char.size = 0.5)
+text(text_x_pos, h.up-0.1, "B", cex = 2.5)
+
+dev.off()
+
+
 #######
 # Next lines are all for Appendix.
 
@@ -180,3 +244,4 @@ round(100 - (100 / (200 * (200 - 1) / 2) * 100), 2)
 round(100 - (199 / (200 * (200 - 1) / 2) * 100), 2)
 # Hub
 round(100 - (190 / (200 * (200 - 1) / 2) * 100), 2)
+
