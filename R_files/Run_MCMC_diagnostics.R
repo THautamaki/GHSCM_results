@@ -83,7 +83,7 @@ calculate_posterior_summaries <- function(all_matrices, datanros, n_warmups = c(
   return(posterior_summaries)
 }
 
-combine_over_datasets <- function(posterior_summaries, score, datanros, n_warmups, n_mcmc_samples) {
+combine_over_datasets <- function(posterior_summaries, datanros, n_warmups, n_mcmc_samples) {
   combined_scores <- list()
   for (n_warmup in n_warmups) {
     for (n_mcmc in n_mcmc_samples) {
@@ -144,7 +144,21 @@ random_5_datasets <- read_matlab_matrices(path, datanros, n_mcmc = 10000)
 random_post_summaries <- calculate_posterior_summaries(random_5_datasets, datanros = datanros,
                                                        n_cores = 16)
 # Combine scores over datasets.
-random_combined_scores <- combine_over_datasets(random_post_summaries, "rhat", datanros, n_warmups, mcmc_lengths)
+random_combined_scores <- combine_over_datasets(random_post_summaries, datanros, n_warmups, mcmc_lengths)
+
+# Save only rhat, ess_bulk and ess_tail.
+for (datanro in datanros) {
+  for (n_warmup in n_warmups) {
+    for (mcmc_length in mcmc_lengths) {
+      random_post_summaries[[paste0(datanro)]][[paste0(n_warmup)]][[paste0(mcmc_length)]] <- random_post_summaries[[paste0(datanro)]][[paste0(n_warmup)]][[paste0(mcmc_length)]][,c("rhat", "ess_bulk", "ess_tail")]
+    }
+  }
+}
+for (n_warmup in n_warmups) {
+  for (mcmc_length in mcmc_lengths) {
+    random_combined_scores[[paste0(n_warmup)]][[paste0(mcmc_length)]] <- random_combined_scores[[paste0(n_warmup)]][[paste0(mcmc_length)]][,c("rhat", "ess_bulk", "ess_tail")]
+  }
+}
 
 # Save summaries.
 saveRDS(random_post_summaries, file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/random_per_dataset.Rds"))
@@ -269,6 +283,20 @@ bdgraph_sf_post_summaries <- calculate_posterior_summaries(bdgraph_sf_5_datasets
 # Combine scores over datasets.
 bdgraph_sf_combined_scores <- combine_over_datasets(bdgraph_sf_post_summaries, "rhat", datanros, n_warmups, mcmc_lengths)
 
+# Save only rhat, ess_bulk and ess_tail.
+for (datanro in datanros) {
+  for (n_warmup in n_warmups) {
+    for (mcmc_length in mcmc_lengths) {
+      bdgraph_sf_post_summaries[[paste0(datanro)]][[paste0(n_warmup)]][[paste0(mcmc_length)]] <- bdgraph_sf_post_summaries[[paste0(datanro)]][[paste0(n_warmup)]][[paste0(mcmc_length)]][,c("rhat", "ess_bulk", "ess_tail")]
+    }
+  }
+}
+for (n_warmup in n_warmups) {
+  for (mcmc_length in mcmc_lengths) {
+    bdgraph_sf_combined_scores[[paste0(n_warmup)]][[paste0(mcmc_length)]] <- bdgraph_sf_combined_scores[[paste0(n_warmup)]][[paste0(mcmc_length)]][,c("rhat", "ess_bulk", "ess_tail")]
+  }
+}
+
 # Save summaries.
 saveRDS(bdgraph_sf_post_summaries, file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/bdgraph_sf_per_dataset.Rds"))
 saveRDS(bdgraph_sf_combined_scores, file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/bdgraph_sf_combined.Rds"))
@@ -315,15 +343,29 @@ huge_sf_5_datasets <- read_matlab_matrices(path, datanros, n_mcmc = 10000)
 huge_sf_post_summaries <- calculate_posterior_summaries(huge_sf_5_datasets, datanros = datanros,
                                                         n_cores = 16)
 # Combine scores over datasets.
-combined_scores <- combine_over_datasets(huge_sf_post_summaries, "rhat", datanros, n_warmups, mcmc_lengths)
+huge_sf_combined_scores <- combine_over_datasets(huge_sf_post_summaries, "rhat", datanros, n_warmups, mcmc_lengths)
+
+# Save only rhat, ess_bulk and ess_tail.
+for (datanro in datanros) {
+  for (n_warmup in n_warmups) {
+    for (mcmc_length in mcmc_lengths) {
+      huge_sf_post_summaries[[paste0(datanro)]][[paste0(n_warmup)]][[paste0(mcmc_length)]] <- huge_sf_post_summaries[[paste0(datanro)]][[paste0(n_warmup)]][[paste0(mcmc_length)]][,c("rhat", "ess_bulk", "ess_tail")]
+    }
+  }
+}
+for (n_warmup in n_warmups) {
+  for (mcmc_length in mcmc_lengths) {
+    huge_sf_combined_scores[[paste0(n_warmup)]][[paste0(mcmc_length)]] <- huge_sf_combined_scores[[paste0(n_warmup)]][[paste0(mcmc_length)]][,c("rhat", "ess_bulk", "ess_tail")]
+  }
+}
 
 # Save summaries.
 saveRDS(huge_sf_post_summaries, file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/huge_sf_per_dataset.Rds"))
-saveRDS(combined_scores, file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/huge_sf_combined.Rds"))
+saveRDS(huge_sf_combined_scores, file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/huge_sf_combined.Rds"))
 
 # Read summaries if already done.
 huge_sf_post_summaries <- readRDS(file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/huge_sf_per_dataset.Rds"))
-combined_scores <- readRDS(file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/huge_sf_combined.Rds"))
+huge_sf_combined_scores <- readRDS(file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/huge_sf_combined.Rds"))
 
 # Plot per dataset boxplots for Rhats and ESSs.
 par(mfrow = c(5,3))
@@ -364,6 +406,20 @@ hub_post_summaries <- calculate_posterior_summaries(hub_5_datasets, datanros = d
                                                     n_cores = 16)
 # Combine scores over datasets.
 hub_combined_scores <- combine_over_datasets(hub_post_summaries, "rhat", datanros, n_warmups, mcmc_lengths)
+
+# Save only rhat, ess_bulk and ess_tail.
+for (datanro in datanros) {
+  for (n_warmup in n_warmups) {
+    for (mcmc_length in mcmc_lengths) {
+      hub_post_summaries[[paste0(datanro)]][[paste0(n_warmup)]][[paste0(mcmc_length)]] <- hub_post_summaries[[paste0(datanro)]][[paste0(n_warmup)]][[paste0(mcmc_length)]][,c("rhat", "ess_bulk", "ess_tail")]
+    }
+  }
+}
+for (n_warmup in n_warmups) {
+  for (mcmc_length in mcmc_lengths) {
+    hub_combined_scores[[paste0(n_warmup)]][[paste0(mcmc_length)]] <- hub_combined_scores[[paste0(n_warmup)]][[paste0(mcmc_length)]][,c("rhat", "ess_bulk", "ess_tail")]
+  }
+}
 
 # Save summaries.
 saveRDS(hub_post_summaries, file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/hub_per_dataset.Rds"))
@@ -423,6 +479,20 @@ random_post_summaries_p200 <- calculate_posterior_summaries(random_5_datasets_p2
 random_combined_scores_p200 <- combine_over_datasets(random_post_summaries_p200, "rhat",
                                                      datanros, n_warmups, mcmc_lengths)
 
+# Save only rhat, ess_bulk and ess_tail.
+for (datanro in datanros) {
+  for (n_warmup in n_warmups) {
+    for (mcmc_length in mcmc_lengths) {
+      random_post_summaries_p200[[paste0(datanro)]][[paste0(n_warmup)]][[paste0(mcmc_length)]] <- random_post_summaries_p200[[paste0(datanro)]][[paste0(n_warmup)]][[paste0(mcmc_length)]][,c("rhat", "ess_bulk", "ess_tail")]
+    }
+  }
+}
+for (n_warmup in n_warmups) {
+  for (mcmc_length in mcmc_lengths) {
+    random_combined_scores_p200[[paste0(n_warmup)]][[paste0(mcmc_length)]] <- random_combined_scores_p200[[paste0(n_warmup)]][[paste0(mcmc_length)]][,c("rhat", "ess_bulk", "ess_tail")]
+  }
+}
+
 # Save summaries.
 saveRDS(random_post_summaries_p200, file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/random_per_dataset_p200.Rds"))
 saveRDS(random_combined_scores_p200, file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/random_combined_p200.Rds"))
@@ -430,6 +500,7 @@ saveRDS(random_combined_scores_p200, file = paste0("Results_files/p", p, "/GHS_M
 # Read summaries if already done.
 random_post_summaries_p200 <- readRDS(file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/random_per_dataset_p200.Rds"))
 random_combined_scores_p200 <- readRDS(file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/random_combined_p200.Rds"))
+
 
 # Plot per dataset boxplots for Rhats and ESSs.
 par(mfrow = c(5,3))
@@ -475,6 +546,20 @@ gc()
 # bdgraph_sf_combined_scores_p200 <- combine_over_datasets(bdgraph_sf_post_summaries_p200, "rhat",
 #                                                          datanros, n_warmups, mcmc_lengths)
 # 
+# Save only rhat, ess_bulk and ess_tail.
+# for (datanro in datanros) {
+#   for (n_warmup in n_warmups) {
+#     for (mcmc_length in mcmc_lengths) {
+#       bdgraph_sf_post_summaries_p200[[paste0(datanro)]][[paste0(n_warmup)]][[paste0(mcmc_length)]] <- bdgraph_sf_post_summaries_p200[[paste0(datanro)]][[paste0(n_warmup)]][[paste0(mcmc_length)]][,c("rhat", "ess_bulk", "ess_tail")]
+#     }
+#   }
+# }
+# for (n_warmup in n_warmups) {
+#   for (mcmc_length in mcmc_lengths) {
+#     bdgraph_sf_combined_scores_p200[[paste0(n_warmup)]][[paste0(mcmc_length)]] <- bdgraph_sf_combined_scores_p200[[paste0(n_warmup)]][[paste0(mcmc_length)]][,c("rhat", "ess_bulk", "ess_tail")]
+#   }
+# }
+#
 # # Save summaries.
 # saveRDS(bdgraph_sf_post_summaries_p200, file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/bdgraph_sf_per_dataset.Rds"))
 # saveRDS(bdgraph_sf_combined_scores_p200, file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/bdgraph_sf_combined.Rds"))
@@ -599,6 +684,20 @@ huge_sf_post_summaries_p200 <- calculate_posterior_summaries(huge_sf_5_datasets_
 huge_sf_combined_scores_p200 <- combine_over_datasets(huge_sf_post_summaries_p200, "rhat", datanros,
                                                       n_warmups, mcmc_lengths)
 
+# Save only rhat, ess_bulk and ess_tail.
+for (datanro in datanros) {
+  for (n_warmup in n_warmups) {
+    for (mcmc_length in mcmc_lengths) {
+      huge_sf_post_summaries_p200[[paste0(datanro)]][[paste0(n_warmup)]][[paste0(mcmc_length)]] <- huge_sf_post_summaries_p200[[paste0(datanro)]][[paste0(n_warmup)]][[paste0(mcmc_length)]][,c("rhat", "ess_bulk", "ess_tail")]
+    }
+  }
+}
+for (n_warmup in n_warmups) {
+  for (mcmc_length in mcmc_lengths) {
+    huge_sf_combined_scores_p200[[paste0(n_warmup)]][[paste0(mcmc_length)]] <- huge_sf_combined_scores_p200[[paste0(n_warmup)]][[paste0(mcmc_length)]][,c("rhat", "ess_bulk", "ess_tail")]
+  }
+}
+
 # Save summaries.
 saveRDS(huge_sf_post_summaries_p200, file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/huge_sf_per_dataset_p200.Rds"))
 saveRDS(huge_sf_combined_scores_p200, file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/huge_sf_combined_p200.Rds"))
@@ -651,6 +750,20 @@ create_boxplots(huge_sf_combined_scores_p200, p, "ess_bulk", n_warmups, mcmc_len
 # hub_combined_scores_p200 <- combine_over_datasets(hub_post_summaries_p200, "rhat", datanros,
 #                                                   n_warmups, mcmc_lengths)
 # 
+# Save only rhat, ess_bulk and ess_tail.
+# for (datanro in datanros) {
+#   for (n_warmup in n_warmups) {
+#     for (mcmc_length in mcmc_lengths) {
+#       hub_post_summaries_p200[[paste0(datanro)]][[paste0(n_warmup)]][[paste0(mcmc_length)]] <- hub_post_summaries_p200[[paste0(datanro)]][[paste0(n_warmup)]][[paste0(mcmc_length)]][,c("rhat", "ess_bulk", "ess_tail")]
+#     }
+#   }
+# }
+# for (n_warmup in n_warmups) {
+#   for (mcmc_length in mcmc_lengths) {
+#     hub_combined_scores_p200[[paste0(n_warmup)]][[paste0(mcmc_length)]] <- hub_combined_scores_p200[[paste0(n_warmup)]][[paste0(mcmc_length)]][,c("rhat", "ess_bulk", "ess_tail")]
+#   }
+# }
+#
 # # Save summaries.
 # saveRDS(hub_post_summaries_p200, file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/hub_per_dataset.Rds"))
 # saveRDS(hub_combined_scores_p200, file = paste0("Results_files/p", p, "/GHS_MCMC/MCMC_diagnostics/hub_combined_p200.Rds"))
