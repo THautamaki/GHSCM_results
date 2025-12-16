@@ -146,7 +146,7 @@ the numbers used in the article, and plots the estimated networks.
 ### Appendix D
 
 Appendix Tables D.1-D.3 can be created using the main R script
-`Run_simulations_R_methods_and_combine_results.R` (lines 138–180).
+`Run_simulations_R_methods_and_combine_results.R` (lines 206–245).
 
 ### Analysis of the initial values of the GHS CM algorithm
 
@@ -171,11 +171,27 @@ and S3, and Supplementary Table S3.
 
 ### Analysis of the threshold value of $\kappa$
 
-Supplementary Figures S4-S6 can be created using the R script
+Supplementary Figures S4-S8 can be created using the R script
 `Analysis_of_kappa_threshold.R`.
 
 ### Additional analysis with the fastGHS method
 
 We did additional analysis with the R package fastGHS, which can be
 reproduced using the R script `Additional_fastGHS_analysis.R`
-(Supplementary Figs. S7 and S8).
+(Supplementary Figs. S9 and S10).
+
+### Additional visualization of the simulation results
+
+Boxplots in Supplementary Section 6 (Supplementary Figs. S11–S14) can be
+created using the main R script
+`Run_simulations_R_methods_and_combine_results.R` (from the line 247 to
+the end).
+
+### MCMC diagnostics
+
+For the MCMC diagnostics, MCMC samples must be first saved using the
+MATLAB script `Save_MCMC_samples.m` from the `MATLAB_files\GHS_MCMC`
+directory. Then, $\hat{R}$ values and effective sample sizes can be
+calculated and plotted (Supplementary Figs. S19–S28) using the R script
+`Run_MCMC_diagnostics.R`. Creates also examples of the trace plots
+(Supplementary Figs. S15–S18).

@@ -86,7 +86,7 @@ We created R and MATLAB scripts to perform analyses of the DLBC dataset. We sugg
 
 ### Appendix D
 
-Appendix Tables D.1-D.3 can be created using the main R script `Run_simulations_R_methods_and_combine_results.R` (lines 138--180).
+Appendix Tables D.1-D.3 can be created using the main R script `Run_simulations_R_methods_and_combine_results.R` (lines 206--245).
 
 ### Analysis of the initial values of the GHS CM algorithm
 
@@ -102,8 +102,16 @@ This analysis can be run using the R script `Analysis_of_tau_values_through_p0.R
 
 ### Analysis of the threshold value of $\kappa$
 
-Supplementary Figures S4-S6 can be created using the R script `Analysis_of_kappa_threshold.R`.
+Supplementary Figures S4-S8 can be created using the R script `Analysis_of_kappa_threshold.R`.
 
 ### Additional analysis with the fastGHS method
 
-We did additional analysis with the R package fastGHS, which can be reproduced using the R script `Additional_fastGHS_analysis.R` (Supplementary Figs. S7 and S8).
+We did additional analysis with the R package fastGHS, which can be reproduced using the R script `Additional_fastGHS_analysis.R` (Supplementary Figs. S9 and S10).
+
+### Additional visualization of the simulation results
+
+Boxplots in Supplementary Section 6 (Supplementary Figs. S11--S14) can be created using the main R script `Run_simulations_R_methods_and_combine_results.R` (from the line 247 to the end).
+
+### MCMC diagnostics
+
+For the MCMC diagnostics, MCMC samples must be first saved using the MATLAB script `Save_MCMC_samples.m` from the `MATLAB_files\GHS_MCMC` directory. Then, $\hat{R}$ values and effective sample sizes can be calculated and plotted (Supplementary Figs. S19--S28) using the R script `Run_MCMC_diagnostics.R`. Creates also examples of the trace plots (Supplementary Figs. S15--S18).
