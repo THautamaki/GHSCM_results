@@ -65,7 +65,6 @@ sample_sizes <- c(120)
 variable_numbers <- c(100, 200)
 structures <- c("random", "bdgraph_sf", "huge_sf", "hubs")
 R_methods <- c("GHSCM", "GLASSO", "fastGHS", "TIGER", "CLIME", "GSCAD")
-R_methods <- c("GSCAD")
 MATLAB_methods <- c("GHS_MCMC", "GHS_LLA", "HSL_MCMC", "HSL_ECM")
 
 # Run all R methods if not yet run.
@@ -174,16 +173,16 @@ create_latex_table("total_time", all_results, other_methods, "hubs", 120, 200)
 # First combine MCC results into matrices.
 column_names <- c("GHS CM", "GHS MCMC", "GHS ECM", "GHS LLA", "GHS-like MCMC", "GHS-like ECM",
                   "GLASSO (StARS)", "TIGER", "CLIME", "GSCAD (BIC)")
-results_p100 <- results_p200 <- matrix(nrow = 50*4, ncol = length(other_methods))
+mcc_p100 <- mcc_p200 <- matrix(nrow = 50*4, ncol = length(other_methods))
 j <- 0
 for (structure in structures) {
   for (i in 1:length(other_methods)) {
-    results_p100[(j*50+1):((j+1)*50),i] <- all_results[[other_methods[i]]][[structure]][["n120_p100"]][["results"]][,"MCC"]
-    results_p200[(j*50+1):((j+1)*50),i] <- all_results[[other_methods[i]]][[structure]][["n120_p200"]][["results"]][,"MCC"]
+    mcc_p100[(j*50+1):((j+1)*50),i] <- all_results[[other_methods[i]]][[structure]][["n120_p100"]][["results"]][,"MCC"]
+    mcc_p200[(j*50+1):((j+1)*50),i] <- all_results[[other_methods[i]]][[structure]][["n120_p200"]][["results"]][,"MCC"]
   }
   j <- j + 1
 }
-colnames(results_p100) <- colnames(results_p200) <- column_names
+colnames(results_p100) <- colnames(mcc_p200) <- column_names
 
 # Next define some variables needed for plotting.
 text_x_pos <- -0.7
@@ -195,9 +194,9 @@ setEPS()
 postscript("Figures/Main_article/CD_diagram.eps", width = 20, height = 5)
 
 par(mfrow = c(1,2))
-plotCD(results_p100, alpha = 0.05, cex = 1.85, char.size = 0.5)
+plotCD(mcc_p100, alpha = 0.05, cex = 1.85, char.size = 0.5)
 text(text_x_pos, h.up-0.1, "A", cex = 2.5)
-plotCD(results_p200, alpha = 0.05, cex = 1.85, char.size = 0.5)
+plotCD(mcc_p200, alpha = 0.05, cex = 1.85, char.size = 0.5)
 text(text_x_pos, h.up-0.1, "B", cex = 2.5)
 
 dev.off()
@@ -244,4 +243,72 @@ round(100 - (100 / (200 * (200 - 1) / 2) * 100), 2)
 round(100 - (199 / (200 * (200 - 1) / 2) * 100), 2)
 # Hub
 round(100 - (190 / (200 * (200 - 1) / 2) * 100), 2)
+
+### Additional visualization of simulation results
+
+methods <- c("GHS CM", "GHS MCMC", "GHS ECM", "GHS LLA", "GHS-like MCMC", "GHS-like ECM",
+             "GLASSO (StARS)", "TIGER", "CLIME", "GSCAD (BIC)")
+
+create_boxplots <- function(all_results, p, score, methods, ylim = c(0,1), filename = NULL,
+                            image_size = c(10, 7), label_position = -0.03) {
+  if (!is.null(filename)) pdf(filename, width = image_size[1], height = image_size[2])
+  scores_per_struct <- list()
+  for (structure in structures) {
+    scores_per_struct[[structure]] <- matrix(nrow = 50, ncol = length(other_methods))
+    for (i in 1:length(other_methods)) {
+      scores_per_struct[[structure]][,i] <- all_results[[other_methods[i]]][[structure]][[paste0("n120_p", p)]][["results"]][, score]
+    }
+    colnames(scores_per_struct[[structure]]) <- methods
+  }
+  par(mfrow = c(2,2))
+  par(mar = c(3.1, 8.1, 1.2, 0.2))
+  par(mgp = c(2,1,0))
+  for (structure in structures) {
+    if (structure == "random") title <- "Random network structure"
+    else if (structure == "bdgraph_sf") title <- "Scale-free network structure (BDgraph)"
+    else if (structure == "huge_sf") title <- "Scale-free network structure (huge)"
+    else if (structure == "hubs") title <- "Hub network structure"
+    if (score == "f_norm_rel") xlabel <- "Relative F norm"
+    else xlabel <- score
+    # if (score == "sl_omega" | score ==  "f_norm_omega" | score == "sl_sigma" | score == "f_norm_sigma") {
+    #   ylim <- c(min(scores_per_struct[[structure]]), max(scores_per_struct[[structure]]))
+    # }
+    boxplot(scores_per_struct[[structure]], xaxt = "n", yaxt = "n", xlab = xlabel,
+            ylim = ylim, main = title, horizontal = TRUE, at = rev(1:length(methods)))
+    
+    axis(side = 2, las = 2, labels = FALSE, at = 1:length(methods))
+    axis(side = 1)
+    
+    text(y = 1:length(methods),
+         x = par("usr")[1] + label_position * (par("usr")[2] - par("usr")[1]),
+         labels = rev(methods),
+         xpd = NA,
+         cex = 1, adj = 1)
+    grid(ny = NA)
+  }
+  if (!is.null(filename)) dev.off()
+}
+
+# Plot only.
+create_boxplots(all_results, 100, "MCC", methods, ylim = c(0, 1))
+create_boxplots(all_results, 200, "MCC", methods, ylim = c(0, 1))
+
+create_boxplots(all_results, 100, "f_norm_rel", methods, ylim = c(0, 1))
+create_boxplots(all_results, 200, "f_norm_rel", methods, ylim = c(0, 1.25))
+
+# Save figures.
+create_boxplots(all_results, 100, "MCC", methods, ylim = c(0, 1),
+                filename = "Figures/Supplementary/MCC_boxplots_p100.pdf",
+                image_size = c(11, 6.5))
+create_boxplots(all_results, 200, "MCC", methods, ylim = c(0, 1),
+                filename = "Figures/Supplementary/MCC_boxplots_p200.pdf",
+                image_size = c(11, 6.5))
+
+create_boxplots(all_results, 100, "f_norm_rel", methods, ylim = c(0, 1),
+                filename = "Figures/Supplementary/Rel_f_norm_boxplots_p100.pdf",
+                image_size = c(11, 6.5))
+create_boxplots(all_results, 200, "f_norm_rel", methods, ylim = c(0, 1.25),
+                filename = "Figures/Supplementary/Rel_f_norm_boxplots_p200.pdf",
+                label_position = -0.05,
+                image_size = c(11, 6.5))
 

@@ -71,32 +71,37 @@ generate_datasets <- function(sample_sizes = 120, variable_numbers = c(100, 200)
         saveRDS(sim_hubs, file = paste0(path, "/huge_hubs_n", n, "_p", p, ".Rds"))
         
         for (i in 1:n_datasets) {
-          sim <- simulations[[paste0("n", n, "_p", p)]][["random"]][[i]]
-          write.csv(sim$data, paste0(path, structure, "/", structure, "_data_nro_", i, ".csv"), row.names = FALSE)
-          write.csv(sim$sigma, paste0(path, structure, "/", structure, "_sigma_nro_", i, ".csv"), row.names = FALSE)
-          write.csv(sim$omega, paste0(path, structure, "/", structure, "_omega_nro_", i, ".csv"), row.names = FALSE)
-          write.csv(sim$theta, paste0(path, structure, "/", structure, "_theta_nro_", i, ".csv"), row.names = FALSE)
+          # Datasets with random structure from BDgraph.
+          structure <- "random"
+          sim <- simulations[[paste0("n", n, "_p", p)]][[structure]][[i]]
+          write.csv(sim$data, paste0(path, "/", structure, "/", structure, "_data_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$sigma, paste0(path, "/",  structure, "/", structure, "_sigma_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$omega, paste0(path, "/", structure, "/", structure, "_omega_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$theta, paste0(path, "/", structure, "/", structure, "_theta_nro_", i, ".csv"), row.names = FALSE)
           
           # Datasets with scale-free structure from BDgraph.
-          sim <-simulations[[paste0("n", n, "_p", p)]][["bdgraph_sf"]][[i]]
-          write.csv(sim$data, paste0(path, structure, "/", structure, "_data_nro_", i, ".csv"), row.names = FALSE)
-          write.csv(sim$sigma, paste0(path, structure, "/", structure, "_sigma_nro_", i, ".csv"), row.names = FALSE)
-          write.csv(sim$omega, paste0(path, structure, "/", structure, "_omega_nro_", i, ".csv"), row.names = FALSE)
-          write.csv(sim$theta, paste0(path, structure, "/", structure, "_theta_nro_", i, ".csv"), row.names = FALSE)
+          structure <- "bdgraph_sf"
+          sim <- simulations[[paste0("n", n, "_p", p)]][[structure]][[i]]
+          write.csv(sim$data, paste0(path, "/", structure, "/", structure, "_data_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$sigma, paste0(path, "/",  structure, "/", structure, "_sigma_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$omega, paste0(path, "/", structure, "/", structure, "_omega_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$theta, paste0(path, "/", structure, "/", structure, "_theta_nro_", i, ".csv"), row.names = FALSE)
           
           # Datasets with scale-free structure from huge.
-          sim <- simulations[[paste0("n", n, "_p", p)]][["huge_sf"]][[i]]
-          write.csv(sim$data, paste0(path, structure, "/", structure, "_data_nro_", i, ".csv"), row.names = FALSE)
-          write.csv(sim$sigma, paste0(path, structure, "/", structure, "_sigma_nro_", i, ".csv"), row.names = FALSE)
-          write.csv(sim$omega, paste0(path, structure, "/", structure, "_omega_nro_", i, ".csv"), row.names = FALSE)
-          write.csv(as.matrix(sim$theta), paste0(path, structure, "/", structure, "_theta_nro_", i, ".csv"), row.names = FALSE)
+          structure <- "huge_sf"
+          sim <- simulations[[paste0("n", n, "_p", p)]][[structure]][[i]]
+          write.csv(sim$data, paste0(path, "/", structure, "/", structure, "_data_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$sigma, paste0(path, "/", structure, "/", structure, "_sigma_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$omega, paste0(path, "/", structure, "/", structure, "_omega_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(as.matrix(sim$theta), paste0(path, "/", structure, "/", structure, "_theta_nro_", i, ".csv"), row.names = FALSE)
           
           # Datasets with hubs structure from huge.
-          sim <- simulations[[paste0("n", n, "_p", p)]][["hubs"]][[i]]
-          write.csv(sim$data, paste0(path, structure, "/", structure, "_data_nro_", i, ".csv"), row.names = FALSE)
-          write.csv(sim$sigma, paste0(path, structure, "/", structure, "_sigma_nro_", i, ".csv"), row.names = FALSE)
-          write.csv(sim$omega, paste0(path, structure, "/", structure, "_omega_nro_", i, ".csv"), row.names = FALSE)
-          write.csv(as.matrix(sim$theta), paste0(path, structure, "/", structure, "_theta_nro_", i, ".csv"), row.names = FALSE)
+          structure <- "hubs"
+          sim <- simulations[[paste0("n", n, "_p", p)]][[structure]][[i]]
+          write.csv(sim$data, paste0(path, "/", structure, "/", structure, "_data_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$sigma, paste0(path, "/", structure, "/", structure, "_sigma_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(sim$omega, paste0(path, "/", structure, "/", structure, "_omega_nro_", i, ".csv"), row.names = FALSE)
+          write.csv(as.matrix(sim$theta), paste0(path, "/", structure, "/", structure, "_theta_nro_", i, ".csv"), row.names = FALSE)
         }
         cat("done!\n")
       }

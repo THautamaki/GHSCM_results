@@ -670,7 +670,7 @@ if (all(true_sparsities == true_sparsities[1,1])) {
 }
 
 # Define legend for the plot and label for x-axis.
-legend_p200 <- c(paste("n =", floor(p * ratios)), "true sparsity / default thr.") 
+legend_p250 <- c(paste("n =", floor(p * ratios)), "true sparsity / default thr.") 
 x_label <- expression(paste("Threshold of 1 - ", kappa))
 
 # Create and save plot.
@@ -693,7 +693,7 @@ plot_sparsity_mcc_f1(200, mean_scores_p200_hub, true_sparsity = true_sparsity_hu
                      plot_rows = 3)
 
 plot_sparsity_mcc_f1(250, mean_scores_p250_cluster, true_sparsity = true_sparsity_cluster_p250, x_label = x_label,
-                     legend = legend_p200, legend_position = "bottomleft", legend_in_plot = 2,
+                     legend = legend_p250, legend_position = "bottomleft", legend_in_plot = 2,
                      ylim_sparsity = c(min(est_sparsities_cluster_p250), max(est_sparsities_cluster_p250)),
                      plot_rows = 3)
 dev.off()

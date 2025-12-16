@@ -1,4 +1,6 @@
 run_analysis <- function(structure, n, p, method = "GHSCM", p0 = 0, save_results = TRUE) {
+  # Convert method string to lower case.
+  method <- tolower(method)
   # Load datasets from file.
   path <- paste0("Data/n", n, "_p", p, "/")
   if (tolower(structure) == "random") {
@@ -18,26 +20,28 @@ run_analysis <- function(structure, n, p, method = "GHSCM", p0 = 0, save_results
   }
   n_datasets <- length(simulations)
   cores <- detectCores(logical = FALSE)
-  if (tolower(method) == "ghscm") {
+  if (method == "ghscm") {
     packages <- c("GHSCM")
   }
-  else if (tolower(method) == "glasso") {
+  else if (method == "glasso") {
     packages <- c("huge", "GHSCM")
   }
-  else if (tolower(method) == "beam") {
+  else if (method == "beam") {
     packages <- c("beam", "GHSCM")
   }
-  else if (tolower(method) == "pulsar") {
+  else if (method == "pulsar") {
     packages <- c("pulsar", "huge", "GHSCM")
   }
-  else if (tolower(method) == "fastghs") {
+  else if (method == "fastghs") {
     packages <- c("fastGHS", "GHSCM")
   }
-  else if (tolower(method) == "tiger" | tolower(method) == "clime") {
+  else if (method == "tiger" | method == "clime") {
     packages <- c("flare", "GHSCM")
   }
+  else if (method == "gscad" | method == "mcp") 
+    packages <- c("GGMncv", "nlshrink", "GHSCM")
   else {
-    stop("Wrong method! Possible choices are 'GHSCM', 'GLASSO', 'pulsar', 'beam', 'fastGHS', 'TIGER', and 'CLIME'.")
+    stop("Wrong method! Possible choices are 'GHSCM', 'GLASSO', 'pulsar', 'beam', 'fastGHS', 'TIGER', 'CLIME', 'GSCAD', and 'MCP'.")
   }
   cl <- makeCluster(cores)
   registerDoParallel(cl)
@@ -45,29 +49,29 @@ run_analysis <- function(structure, n, p, method = "GHSCM", p0 = 0, save_results
   results <- foreach (i = 1:n_datasets, .combine = "rbind", .packages = packages,
                       .verbose = FALSE) %dopar% {
     sim <- simulations[[i]]
-    if (tolower(method) == "ghscm") {
+    if (method == "ghscm") {
       map <- GHS_MAP_estimation(sim$data, verbose = 0, p0 = p0, max_iterations = 1000, tol = 1e-4)
       theta_est <- map$Theta
       sigma_est <- map$Sigma_est
       omega_est <- map$Omega_est
       time <- map$tot_time
     }
-    else if (tolower(method) == "glasso") {
+    else if (method == "glasso") {
       start_glasso <- Sys.time()
       glasso_est <- huge(sim$data, nlambda = 50, method = "glasso")
       stars_select <- huge.select(glasso_est, criterion = "stars")
       time <- as.numeric(difftime(Sys.time(), start_glasso, units = "secs"))
-      theta_est <- stars_select$refit
+      theta_est <- as.matrix(stars_select$refit)
       omega_est <- stars_select$opt.icov
     }
-    else if (tolower(method) == "beam") {
+    else if (method == "beam") {
       beam_start <- Sys.time()
       beam_est <- beam(sim$data)
       beam_select <- beam.select(beam_est)
       time <- as.numeric(difftime(Sys.time(), beam_start, units = "secs"))
       theta_est <- igraph::as_adjacency_matrix(ugraph(beam_select), names = FALSE)
     }
-    else if (tolower(method) == "pulsar") {
+    else if (method == "pulsar") {
       pulsar_start <- Sys.time()
       lmax <- getMaxCov(cov(sim$data))
       lams <- getLamPath(lmax, lmax * 0.1, len = 50)
@@ -80,7 +84,7 @@ run_analysis <- function(structure, n, p, method = "GHSCM", p0 = 0, save_results
       theta_est <- as.matrix(fit.p$refit$stars)
       diag(theta_est) <- 0
     }
-    else if (tolower(method) == "fastghs") {
+    else if (method == "fastghs") {
       n <- nrow(sim$data)
       p <- ncol(sim$data)
       fastghs_start <- Sys.time()
@@ -93,23 +97,47 @@ run_analysis <- function(structure, n, p, method = "GHSCM", p0 = 0, save_results
       omega_est <- result$theta
       sigma_est <- result$sigma
     }
-    else if (tolower(method) == "tiger") {
+    else if (method == "tiger") {
       n <- nrow(sim$data)
       p <- ncol(sim$data)
       tiger_start <- Sys.time()
       result <- sugm(sim$data, method = "tiger", verbose = FALSE)
       time <- as.numeric(difftime(Sys.time(), tiger_start, units = "secs"))
-      theta_est <- result$path[[5]]
+      theta_est <- as.matrix(result$path[[5]])
       omega_est <- result$icov[[5]]
     }
-    else if (tolower(method) == "clime") {
+    else if (method == "clime") {
       n <- nrow(sim$data)
       p <- ncol(sim$data)
-      tiger_start <- Sys.time()
+      clime_start <- Sys.time()
       result <- sugm(sim$data, method = "clime", verbose = FALSE)
-      time <- as.numeric(difftime(Sys.time(), tiger_start, units = "secs"))
-      theta_est <- result$path[[4]]
+      time <- as.numeric(difftime(Sys.time(), clime_start, units = "secs"))
+      theta_est <- as.matrix(result$path[[4]])
       omega_est <- result$icov[[4]]
+    }
+    else if (method == "gscad") {
+      n <- nrow(sim$data)
+      p <- ncol(sim$data)
+      cor_mat <- cor(sim$data)
+      gscad_start <- Sys.time()
+      result <- ggmncv(cor_mat, n = n, penalty = "scad", ic = "ebic", lambda_min_ratio = 0.15,
+                       initial = nlshrink::linshrink_cov(cor_mat), ebic_gamma = 0)
+      time <- as.numeric(difftime(Sys.time(), gscad_start, units = "secs"))
+      theta_est <- result$adj
+      diag(theta_est) <- 0
+      omega_est <- result$Theta
+    }
+    else if (method == "mcp") {
+      n <- nrow(sim$data)
+      p <- ncol(sim$data)
+      cor_mat <- cor(sim$data)
+      mcp_start <- Sys.time()
+      result <- ggmncv(cor_mat, n = n, penalty = "mcp", ic = "ebic",
+                       initial = nlshrink::linshrink_cov(cor_mat))
+      time <- as.numeric(difftime(Sys.time(), mcp_start, units = "secs"))
+      theta_est <- result$adj
+      diag(theta_est) <- 0
+      omega_est <- result$Theta
     }
     edge_count <- sum(theta_est) / 2
     cm <- conf_matrix(sim$theta, theta_est)
@@ -118,14 +146,14 @@ run_analysis <- function(structure, n, p, method = "GHSCM", p0 = 0, save_results
     f_norm_sigma <- NA
     f_norm_omega <- NA
     f_norm_rel <- NA
-    if (tolower(method) == "ghscm" | tolower(method) == "fastghs") {
+    if (method == "ghscm" | method == "fastghs") {
       sl_omega <- stein_loss(sim$omega, omega_est)
       sl_sigma <- stein_loss(sim$sigma, sigma_est)
       f_norm_omega <- norm(sim$omega - omega_est, type = "f")
       f_norm_sigma <- norm(sim$sigma - sigma_est, type = "f")
       f_norm_rel <- f_norm_omega / norm(sim$omega, type = "f")
     }
-    else if (tolower(method) == "glasso" | tolower(method) == "tiger" | tolower(method == "clime")) {
+    else if (method == "glasso" | method == "tiger" | method == "clime" | method == "gscad" | method == "mcp") {
       sl_omega <- stein_loss(sim$omega, omega_est)
       f_norm_omega <- norm(sim$omega - omega_est, type = "f")
       f_norm_rel <- f_norm_omega / norm(sim$omega, type = "f")
@@ -140,7 +168,7 @@ run_analysis <- function(structure, n, p, method = "GHSCM", p0 = 0, save_results
   results <- list(results = results, total_time = total_time)
   if (save_results) {
     results_path <- paste0("Results_files/p", p, "/", method, "/")
-    if (tolower(method) == "ghscm" & tolower(structure) == "random" & p0 > 0) {
+    if (method == "ghscm" & tolower(structure) == "random" & p0 > 0) {
       saveRDS(results, file = paste0(results_path, structure, "_p", p, "_", method, "_results_2.Rds"))
     }
     else {
@@ -540,5 +568,103 @@ create_sparsity_table <- function(all_results, methods, structures, sample_sizes
         cat("\\\\\n")
       }
     }
+  }
+}
+
+plotCD <- function (results.matrix, alpha = 0.05, cex = 0.75, char.size = 0.001, ...) {
+  opar <- par(mai = c(0, 0, 0, 0))
+  on.exit(par(opar))
+  k <- dim(results.matrix)[2]
+  N <- dim(results.matrix)[1]
+  cd <- scmamp:::getNemenyiCD(alpha = alpha, num.alg = k, num.problems = N)
+  mean.rank <- sort(colMeans(scmamp::rankMatrix(results.matrix, ...)))
+  lp <- round(k/2)
+  left.algs <- mean.rank[1:lp]
+  right.algs <- mean.rank[(lp + 1):k]
+  max.rows <- ceiling(k/2)
+  #char.size <- 0.001
+  line.spacing <- 0.25
+  m <- floor(min(mean.rank))
+  M <- ceiling(max(mean.rank))
+  max.char <- max(sapply(colnames(results.matrix), FUN = nchar))
+  text.width <- (max.char + 4) * char.size
+  w <- (M - m) + 2 * text.width
+  h.up <- 2.5 * line.spacing
+  h.down <- (max.rows + 2.25) * line.spacing
+  tick.h <- 0.25 * line.spacing
+  label.displacement <- 0.25
+  line.displacement <- 0.025
+  plot(0, 0, type = "n", xlim = c(m - w/(M - m), M + w/(M - 
+                                                          m)), ylim = c(-h.down, h.up), xaxt = "n", yaxt = "n", 
+       xlab = "", ylab = "", bty = "n")
+  lines(c(m, M), c(0, 0))
+  dk <- sapply(m:M, FUN = function(x) {
+    lines(c(x, x), c(0, tick.h))
+    text(x, 3 * tick.h, labels = x, cex = cex)
+  })
+  lines(c(m, m + cd), c(1.75 * line.spacing, 1.75 * line.spacing))
+  text(m + cd/2, 2.25 * line.spacing, "CD", cex = cex)
+  lines(c(m, m), c(1.75 * line.spacing - tick.h/4, 1.75 * 
+                     line.spacing + tick.h/4))
+  lines(c(m + cd, m + cd), c(1.75 * line.spacing - tick.h/4, 
+                             1.75 * line.spacing + tick.h/4))
+  dk <- sapply(1:length(left.algs), FUN = function(x) {
+    line.h <- -line.spacing * (x + 2)
+    text(x = m - label.displacement, y = line.h, labels = names(left.algs)[x], 
+         cex = cex, adj = 1)
+    lines(c(m - label.displacement * 0.75, left.algs[x]), 
+          c(line.h, line.h))
+    lines(c(left.algs[x], left.algs[x]), c(line.h, 0))
+  })
+  dk <- sapply(1:length(right.algs), FUN = function(x) {
+    line.h <- -line.spacing * (x + 2)
+    text(x = M + label.displacement, y = line.h, labels = names(right.algs)[x], 
+         cex = cex, adj = 0)
+    lines(c(M + label.displacement * 0.75, right.algs[x]), 
+          c(line.h, line.h))
+    lines(c(right.algs[x], right.algs[x]), c(line.h, 0))
+  })
+  getInterval <- function(x) {
+    from <- mean.rank[x]
+    diff <- mean.rank - from
+    ls <- which(diff > 0 & diff < cd)
+    if (length(ls) > 0) {
+      c(from, mean.rank[max(ls)])
+    }
+  }
+  intervals <- mapply(1:k, FUN = getInterval)
+  aux <- do.call(rbind, intervals)
+  if (NROW(aux) > 0) {
+    to.join <- aux[1, ]
+    if (nrow(aux) > 1) {
+      for (r in 2:nrow(aux)) {
+        if (aux[r - 1, 2] < aux[r, 2]) {
+          to.join <- rbind(to.join, aux[r, ])
+        }
+      }
+    }
+    row <- c(1)
+    if (!is.matrix(to.join)) {
+      to.join <- t(as.matrix(to.join))
+    }
+    nlines <- dim(to.join)[1]
+    for (r in 1:nlines) {
+      if (r == 1) {
+        row <- 1
+        next
+      }
+      if (to.join[r, 1] > to.join[r - 1, 2]) {
+        row <- c(row, 1)
+      }
+      else {
+        row <- c(row, tail(row, 1) + 1)
+      }
+    }
+    step <- max(row)/2
+    dk <- sapply(1:nlines, FUN = function(x) {
+      y <- -line.spacing * (0.5 + row[x]/step)
+      lines(c(to.join[x, 1] - line.displacement, to.join[x, 
+                                                         2] + line.displacement), c(y, y), lwd = 3)
+    })
   }
 }
