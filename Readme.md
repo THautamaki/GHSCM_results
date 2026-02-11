@@ -5,7 +5,7 @@ This repository contains all codes and results files used to produce the
 results for the article *GHSCM: Efficient maximum a posteriori inference
 for biological networks with the graphical horseshoe prior*.
 
-We implemented our method in the R package called GHSCM, which is
+Our method is implemented in the R package called GHSCM, which is
 available on GitHub at <https://github.com/THautamaki/GHSCM>.
 
 ## Original MATLAB codes
