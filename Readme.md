@@ -26,6 +26,11 @@ methods can be found on the following GitHub pages:
 
 ## Real-world datasets
 
+> [!NOTE] The CEU dataset can also be found in the R package `BDgraph`
+> using the command `data(geneExpression)`. It contains the same
+> variables, but they are ordered by variance, whereas our
+> implementation keeps the original order.
+
 The CEU dataset is available on the Sanger Institute’s website at
 <https://ftp.sanger.ac.uk/pub/genevar>, and the data file is named
 `CEU_parents-normalised.csv`. The DLBC dataset is available on the
@@ -70,8 +75,7 @@ follows:
 
 ## Performing the simulation analyses
 
-> [!IMPORTANT]
-> All provided scripts assume the working directory has
+> [!IMPORTANT] All provided scripts assume the working directory has
 > the same directory structure as this repository. The scripts use
 > relative paths to read and save files.
 
@@ -96,8 +100,7 @@ run-to-run variance as we do not use fixed seeds for every MATLAB method
 (and StARS for GLASSO). The biggest difference in MCC we saw was about
 0.012.
 
-> [!CAUTION]
-> Please note that if a similar system is used, as
+> [!CAUTION] Please note that if a similar system is used, as
 > described in the article (a 16-core AMD Ryzen 9 7950X3D processor and
 > 64 GB of RAM), all simulations require approximately 4.5 days to
 > complete.
